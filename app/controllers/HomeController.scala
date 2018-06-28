@@ -11,20 +11,18 @@ import play.api.mvc._
 @Singleton
 class HomeController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
 
-  /**
-   * Create an Action to render an HTML page.
-   *
-   * The configuration in the `routes` file means that this method
-   * will be called when the application receives a `GET` request with
-   * a path of `/`.
-   */
+  // TODO: Split controller
   def index() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.index())
   }
   def signIn() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.signin())
   }
-  def user() = Action { implicit request: Request[AnyContent] =>
+  def userManagement() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.managementUser())
   }
+  def evaluationManagement() = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.managementEvaluation())
+  }
+
 }
