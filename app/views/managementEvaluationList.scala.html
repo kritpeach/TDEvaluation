@@ -1,12 +1,12 @@
 @()
-@managementMain("User management") {
+@managementMain("Evaluation management") {
     <div class="row">
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title float-left">User account management</h4>
+                    <h4 class="card-title float-left">Evaluation management</h4>
                     <div class="float-right">
-                        <button data-toggle="modal" data-target="#myModal" class="btn btn-success btn-block">New user
+                        <button data-toggle="modal" data-target="#myModal" class="btn btn-success btn-block">New evaluation form
                             <i class="mdi mdi-plus"></i>
                         </button>
                     </div>
@@ -14,15 +14,15 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>User</th>
-                                    <th>Role</th>
+                                    <th>Topic</th>
+                                    <th>Created date</th>
                                     <th class="text-right">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>Jacob</td>
-                                    <td>Assessor</td>
+                                    <td>Evaluation form 1</td>
+                                    <td>28 June 2018</td>
                                     <td class="text-right">
                                         <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
                                             <i class="mdi mdi-pencil"></i>
@@ -33,8 +33,8 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>Messsy</td>
-                                    <td>Assessor</td>
+                                    <td>Evaluation form 2</td>
+                                    <td>30 June 2018</td>
                                     <td class="text-right">
                                         <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
                                             <i class="mdi mdi-pencil"></i>
@@ -45,32 +45,8 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>John</td>
-                                    <td>Assessor</td>
-                                    <td class="text-right">
-                                        <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
-                                            <i class="mdi mdi-pencil"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-danger">
-                                            <i class="mdi mdi-delete"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Peter</td>
-                                    <td>Assessor</td>
-                                    <td class="text-right">
-                                        <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
-                                            <i class="mdi mdi-pencil"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-danger">
-                                            <i class="mdi mdi-delete"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Dave</td>
-                                    <td>Manager</td>
+                                    <td>Evaluation form 3</td>
+                                    <td>1 July 2018</td>
                                     <td class="text-right">
                                         <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
                                             <i class="mdi mdi-pencil"></i>
@@ -91,20 +67,12 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">New user</h4>
+                    <h4 class="modal-title">New evaluation form</h4>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="exampleInputEmail1">Username</label>
-                        <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Username">
-                    </div>
-                    <div class="form-group">
-                        <label for="exampleInputPassword1">Password</label>
-                        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-                    </div>
-                    <div class="form-group">
-                        <label for="exampleInputPassword1">Confirm password</label>
-                        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Confirm password">
+                        <label>Evaluation topic</label>
+                        <input type="text" class="form-control" placeholder="Enter evaluation topic">
                     </div>
                 </div>
                 <div class="modal-footer">
