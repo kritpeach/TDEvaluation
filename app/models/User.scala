@@ -1,3 +1,3 @@
 package models
 
-case class User(username: String, password: String, isManager: Boolean)
+case class User(id: Option[Long] = None, username: String, password: String, isManager: Boolean)
