@@ -18,7 +18,8 @@ class UserController @Inject()(
     Ok(views.html.managementUserList())
   }
 
-  def userList() = Action.async {
-    userDAO.all().map { case (x) => Ok(x(1).username) }
+  def userList() = Action { implicit request =>
+    // userDAO.all()
+    Ok("TEST")
   }
 }

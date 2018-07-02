@@ -2,14 +2,14 @@ package dao
 
 import javax.inject.Inject
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import slick.jdbc.JdbcProfile
+import slick.jdbc.PostgresProfile.api._
 
 import scala.concurrent.{ExecutionContext, Future}
 import models.User
+import slick.jdbc.JdbcProfile
+
 
 class UserDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
-
-  import profile.api._
   private val Users = TableQuery[UsersTable]
   def all(): Future[Seq[User]] = db.run(Users.result)
 
