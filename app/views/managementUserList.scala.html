@@ -1,124 +1,117 @@
-@()
+@(userListJSON: String)(implicit request: RequestHeader)
 @managementMain("User management") {
-    <div class="row">
-        <div class="col-lg-12 grid-margin stretch-card">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title float-left">User account management</h4>
-                    <div class="float-right">
-                        <button data-toggle="modal" data-target="#myModal" class="btn btn-success btn-block">New user
-                            <i class="mdi mdi-plus"></i>
-                        </button>
+    <div id="app">
+        <div class="row">
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title float-left">User account management</h4>
+                        <div class="float-right">
+                            <button data-toggle="modal" data-target="#myModal" class="btn btn-success btn-block">
+                                New user
+                                <i class="mdi mdi-plus"></i>
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Role</th>
+                                        <th class="text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="user in userList">
+                                        <td>{{user.username}}</td>
+                                        <td v-if="user.isManager">Manager</td>
+                                        <td v-else>Assessor</td>
+                                        <td class="text-right">
+                                            <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
+                                                <i class="mdi mdi-pencil"></i>
+                                            </button>
+                                            <button v-on:click="remove(user.id,user.username)" type="button" class="btn btn-icons btn-sm btn-inverse-outline-danger">
+                                                <i class="mdi mdi-delete"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>User</th>
-                                    <th>Role</th>
-                                    <th class="text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Jacob</td>
-                                    <td>Assessor</td>
-                                    <td class="text-right">
-                                        <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
-                                            <i class="mdi mdi-pencil"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-danger">
-                                            <i class="mdi mdi-delete"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Messsy</td>
-                                    <td>Assessor</td>
-                                    <td class="text-right">
-                                        <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
-                                            <i class="mdi mdi-pencil"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-danger">
-                                            <i class="mdi mdi-delete"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>John</td>
-                                    <td>Assessor</td>
-                                    <td class="text-right">
-                                        <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
-                                            <i class="mdi mdi-pencil"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-danger">
-                                            <i class="mdi mdi-delete"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Peter</td>
-                                    <td>Assessor</td>
-                                    <td class="text-right">
-                                        <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
-                                            <i class="mdi mdi-pencil"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-danger">
-                                            <i class="mdi mdi-delete"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Dave</td>
-                                    <td>Manager</td>
-                                    <td class="text-right">
-                                        <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
-                                            <i class="mdi mdi-pencil"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-danger">
-                                            <i class="mdi mdi-delete"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                </div>
+            </div>
+        </div>
+        <div class="modal" id="myModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">New user</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <input type="email" class="form-control" v-model="form.username" name="username" id="username" placeholder="Username">
+                            </div>
+                            <div class="form-group">
+                                <label for="password1">Password</label>
+                                <input type="password" class="form-control" v-model="form.password" name="password" id="password1" placeholder="Password">
+                            </div>
+                            <div class="form-group">
+                                <div class="form-check form-check-flat">
+                                    <label class="form-check-label">
+                                        <input name="is_manager" type="checkbox" v-model="form.is_manager" value="true" class="form-check-input">
+                                        Manager
+                                        <i class="input-helper"></i></label>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button v-on:click="create" class="btn btn-success mr-2">Submit</button>
+                        <button class="btn btn-light" data-dismiss="modal">Cancel</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal" id="myModal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">New user</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="exampleInputEmail1">Username</label>
-                        <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Username">
-                    </div>
-                    <div class="form-group">
-                        <label for="exampleInputPassword1">Password</label>
-                        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-                    </div>
-                    <div class="form-group">
-                        <label for="exampleInputPassword2">Confirm password</label>
-                        <input type="password" class="form-control" id="exampleInputPassword2" placeholder="Confirm password">
-                    </div>
-                    <div class="form-group">
-                        <label>Role</label>
-                        <select class="form-control">
-                            <option>Assessor</option>
-                            <option>Manager</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success mr-2">Submit</button>
-                    <button class="btn btn-light" data-dismiss="modal">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <script>
+            const getFormData = object => Object.keys(object).reduce((formData, key) => {
+                formData.append(key, object[key]);
+                return formData;
+            }, new FormData());
+            new Vue({
+                el: '#app',
+                data: {
+                    userList: @Html(userListJSON),
+                    form: {
+                        username: '',
+                        password: '',
+                        is_manager: ''
+                    }
+                },
+                methods: {
+                    async remove(id, username) {
+                        if (confirm(`Are you sure you want to delete ${username}?`)) {
+                            await fetch(`user/delete/${id}`)
+                            this.userList = this.userList.filter(user => user.id !== id)
+                        }
+                    },
+                    async create() {
+                        /*
+                        const formData = new URLSearchParams(new FormData(document.querySelector("form"))).toString()
+                        const response = await fetch("
+                        @routes.UserController.createUser()", {
+                            method: "POST",
+                            body: formData
+                        })
+                        */
+                        console.log(this.form)
+                        console.log(getFormData(this.form))
+                    }
+                }
+            })
+            //new URLSearchParams(new FormData(document.querySelector("form"))).toString()
+    </script>
 }

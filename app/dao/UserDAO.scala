@@ -12,14 +12,21 @@ class UserDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
   import profile.api._
 
   private val Users = TableQuery[UsersTable]
-  def all(): Future[Seq[User]] = db.run(Users.result)
-  def insert(user: User) = db.run(Users += user).map(_ => ())
-  def createTable = db.run(Users.schema.create)
+
+  def list(): Future[Seq[User]] = db.run(Users.result)
+
+  def insert(user: User): Future[Int] = db.run(Users += user)
+
+  def delete(id: Long): Future[Int] = db.run(Users.filter(_.id === id).delete)
+
+  def createTable: Future[Unit] = db.run(Users.schema.create)
 
   private class UsersTable(tag: Tag) extends Table[User](tag, "USER") {
     def id = column[Long]("ID", O.PrimaryKey, O.AutoInc)
 
     def username = column[String]("USERNAME")
+
+    def idx = index("idx_username", username, unique = true)
 
     def password = column[String]("PASSWORD")
 
