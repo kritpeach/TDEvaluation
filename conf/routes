@@ -1,13 +1,16 @@
 # An example controller showing a sample home page
-GET        /                                                            controllers.HomeController.index
+GET         /                                                            controllers.HomeController.index
 
 #TODO: Split controller
-GET        /signin                                                      controllers.HomeController.signIn
-GET        /management/user                                             controllers.UserController.managementUserList
-GET        /management/evaluation                                       controllers.HomeController.managementEvaluationList
-GET        /management/evaluation/edit/:id                              controllers.HomeController.managementEvaluationEdit(id: Long)
-GET        /management/evaluation/:id                                   controllers.HomeController.managementEvaluationView(id: Long)
-GET        /management/evaluation/:evaluationFormId/user/:userId        controllers.HomeController.managementEvaluationResponse(evaluationFormId: Long,userId: Long)
-GET        /userlist                                                    controllers.UserController.userList
+GET         /signin                                                      controllers.HomeController.signIn
+GET         /management/user                                             controllers.UserController.managementUserList
+POST        /management/user                                             controllers.UserController.createUser
+GET         /gentable/user                                               controllers.UserController.createTable
+GET         /management/user/delete/:id                                  controllers.UserController.deleteUser(id: Long)
+GET         /management/evaluation                                       controllers.HomeController.managementEvaluationList
+GET         /management/evaluation/edit/:id                              controllers.HomeController.managementEvaluationEdit(id: Long)
+GET         /management/evaluation/:id                                   controllers.HomeController.managementEvaluationView(id: Long)
+GET         /management/evaluation/:evaluationFormId/user/:userId        controllers.HomeController.managementEvaluationResponse(evaluationFormId: Long,userId: Long)
+GET         /userlist                                                    controllers.UserController.userList
 # Map static resources from the /public folder to the /assets URL path
-GET        /assets/*file                                                controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                                                controllers.Assets.versioned(path="/public", file: Asset)
