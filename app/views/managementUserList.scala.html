@@ -61,7 +61,7 @@
                             <div class="form-group">
                                 <div class="form-check form-check-flat">
                                     <label class="form-check-label">
-                                        <input name="is_manager" type="checkbox" v-model="form.is_manager" value="true" class="form-check-input">
+                                        <input name="is_manager" type="checkbox" v-model="form.isManager" value="true" class="form-check-input">
                                         Manager
                                         <i class="input-helper"></i></label>
                                 </div>
@@ -69,7 +69,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button v-on:click="create" class="btn btn-success mr-2">Submit</button>
+                        <button v-on:click="create" :disabled="submitting" class="btn btn-success mr-2">
+                            <i v-if="submitting" class="mdi mdi-refresh mdi-spin"></i>Submit</button>
                         <button class="btn btn-light" data-dismiss="modal">Cancel</button>
                     </div>
                 </div>
@@ -77,38 +78,43 @@
         </div>
     </div>
     <script>
-            const getFormData = object => Object.keys(object).reduce((formData, key) => {
-                formData.append(key, object[key]);
-                return formData;
-            }, new FormData());
+            const emptyForm = {
+                username: '',
+                password: '',
+                isManager: false
+            };
             new Vue({
                 el: '#app',
                 data: {
                     userList: @Html(userListJSON),
-                    form: {
-                        username: '',
-                        password: '',
-                        is_manager: ''
-                    }
+                    form: {...emptyForm},
+                    submitting: false
                 },
                 methods: {
                     async remove(id, username) {
                         if (confirm(`Are you sure you want to delete ${username}?`)) {
-                            await fetch(`user/delete/${id}`)
-                            this.userList = this.userList.filter(user => user.id !== id)
+                            await fetch(`user/delete/${id}`);
+                            this.userList = this.userList.filter(user => user.id !== id);
                         }
                     },
                     async create() {
-                        /*
-                        const formData = new URLSearchParams(new FormData(document.querySelector("form"))).toString()
-                        const response = await fetch("
-                        @routes.UserController.createUser()", {
+                        this.submitting = true
+                        const response = await fetch("@routes.UserController.createUser()", {
                             method: "POST",
-                            body: formData
-                        })
-                        */
-                        console.log(this.form)
-                        console.log(getFormData(this.form))
+                            body: JSON.stringify(this.form),
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        const result = await response.json();
+                        if (result.success) {
+                            this.userList = [...this.userList, result.user];
+                            alert(`Created ${result.user.username}`)
+                            this.form = {...emptyForm};
+                        } else if (result.uniqueViolation) {
+                            alert(`${this.form.username} is already exist`);
+                        }
+                        this.submitting = false
                     }
                 }
             })

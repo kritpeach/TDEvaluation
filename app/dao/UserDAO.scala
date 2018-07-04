@@ -7,6 +7,8 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import models.User
 
+import scala.util.Try
+
 class UserDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   import profile.api._
@@ -15,7 +17,9 @@ class UserDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
 
   def list(): Future[Seq[User]] = db.run(Users.result)
 
-  def insert(user: User): Future[Int] = db.run(Users += user)
+  def insert(user: User): Future[User] = db
+    .run(Users returning Users.map(_.id) += user)
+    .map(id => user.copy(id = Some(id)))
 
   def delete(id: Long): Future[Int] = db.run(Users.filter(_.id === id).delete)
 
@@ -32,7 +36,7 @@ class UserDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
 
     def isManager = column[Boolean]("IS_MANAGER")
 
-    def * = (id.?, username, password, isManager) <> (User.tupled, User.unapply)
+    def * = (id.?, username, password, isManager) <> ((User.apply _).tupled, User.unapply)
   }
 
 }
