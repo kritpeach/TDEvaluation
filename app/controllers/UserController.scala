@@ -43,11 +43,11 @@ class UserController @Inject()(
     userDAO.delete(id).map(x => Ok(Json.toJson(x)))
   }
 
-  def createUser(): Action[AnyContent] = Action { implicit request =>
+  def upsertUser(): Action[AnyContent] = Action { implicit request =>
     val userResult = request.body.asJson.get.validate[User]
     userResult match {
       case JsSuccess(user: User, _) =>
-        Try(Await.result(userDAO.insert(user), Duration.Inf)) match {
+        Try(Await.result(userDAO.upsert(user), Duration.Inf)) match {
           case Success(u) => Ok(Json.obj("success" -> true, "user" -> u))
           case Failure(e: PSQLException) => e.getSQLState match {
             case "23505" => Ok(Json.obj("success" -> false, "uniqueViolation" -> true))
