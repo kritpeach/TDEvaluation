@@ -23,14 +23,22 @@ class UserController @Inject()(
                                 userDAO: UserDAO,
                                 cc: ControllerComponents)
                               (implicit executionContext: ExecutionContext) extends AbstractController(cc) with I18nSupport {
-  val userForm: Form[User] = Form(
-    mapping(
-      "id" -> optional(longNumber),
+
+  val loginForm = Form(
+    tuple(
       "username" -> nonEmptyText,
-      "password" -> nonEmptyText,
-      "is_manager" -> boolean
-    )(User.apply)(User.unapply)
+      "password" -> nonEmptyText
+    )
   )
+  def authenticate = Action { implicit request =>
+    loginForm.bindFromRequest.fold(
+      formWithErrors => BadRequest(formWithErrors.data.toString()),
+      user => {
+        //userDAO.getUser(user._1,user._2).map(_ => Ok(""))
+        Ok("")
+      }
+    )
+  }
 
   def managementUserList(): Action[AnyContent] = Action.async { implicit request =>
     userDAO.list.map(users => {
