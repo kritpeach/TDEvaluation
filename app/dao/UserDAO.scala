@@ -15,13 +15,19 @@ class UserDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
 
   private val Users = TableQuery[UsersTable]
 
-  def list(): Future[Seq[User]] = db.run(Users.result)
+  def list(): Future[Seq[User]] = db.run(Users.sortBy(_.username).result)
 
   def insert(user: User): Future[User] = db
     .run(Users returning Users.map(_.id) += user)
     .map(id => user.copy(id = Some(id)))
 
   def delete(id: Long): Future[Int] = db.run(Users.filter(_.id === id).delete)
+
+  // .map(u => user.copy(id = u.get.id))
+  def upsert(user: User) = db.run((Users returning Users).insertOrUpdate(user)).map {
+    case None => user
+    case u => user.copy(id = u.get.id)
+  }
 
   def createTable: Future[Unit] = db.run(Users.schema.create)
 

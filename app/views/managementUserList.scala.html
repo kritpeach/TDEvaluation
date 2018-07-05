@@ -7,7 +7,7 @@
                     <div class="card-body">
                         <h4 class="card-title float-left">User account management</h4>
                         <div class="float-right">
-                            <button data-toggle="modal" data-target="#myModal" class="btn btn-success btn-block">
+                            <button v-on:click="showCreateModal" class="btn btn-success btn-block">
                                 New user
                                 <i class="mdi mdi-plus"></i>
                             </button>
@@ -22,12 +22,12 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="user in userList">
+                                    <tr v-for="user in userListSortByName">
                                         <td>{{user.username}}</td>
                                         <td v-if="user.isManager">Manager</td>
                                         <td v-else>Assessor</td>
                                         <td class="text-right">
-                                            <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
+                                            <button v-on:click="showEditModal(user)" type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
                                                 <i class="mdi mdi-pencil"></i>
                                             </button>
                                             <button v-on:click="remove(user.id,user.username)" type="button" class="btn btn-icons btn-sm btn-inverse-outline-danger">
@@ -46,7 +46,8 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">New user</h4>
+                        <h4 v-if="isEditMode" class="modal-title">Edit user</h4>
+                        <h4 v-else class="modal-title">New user</h4>
                     </div>
                     <div class="modal-body">
                         <form>
@@ -69,7 +70,7 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button v-on:click="create" :disabled="submitting" class="btn btn-success mr-2">
+                        <button v-on:click="submit" :disabled="submitting" class="btn btn-success mr-2">
                             <i v-if="submitting" class="mdi mdi-refresh mdi-spin"></i>Submit</button>
                         <button class="btn btn-light" data-dismiss="modal">Cancel</button>
                     </div>
@@ -79,6 +80,7 @@
     </div>
     <script>
             const emptyForm = {
+                id: null,
                 username: '',
                 password: '',
                 isManager: false
@@ -88,7 +90,19 @@
                 data: {
                     userList: @Html(userListJSON),
                     form: {...emptyForm},
-                    submitting: false
+                    submitting: false,
+                    isEditMode: false
+                },
+                computed: {
+                  userListSortByName() {
+                      return this.userList.sort((a,b) => {
+                          if (a.username < b.username)
+                              return -1;
+                          if (a.username > b.username)
+                              return 1;
+                          return 0;
+                      });
+                  }
                 },
                 methods: {
                     async remove(id, username) {
@@ -97,9 +111,9 @@
                             this.userList = this.userList.filter(user => user.id !== id);
                         }
                     },
-                    async create() {
+                    async submit() {
                         this.submitting = true
-                        const response = await fetch("@routes.UserController.createUser()", {
+                        const response = await fetch("@routes.UserController.upsertUser()", {
                             method: "POST",
                             body: JSON.stringify(this.form),
                             headers: {
@@ -107,14 +121,27 @@
                             }
                         });
                         const result = await response.json();
-                        if (result.success) {
+                        if (!this.isEditMode && result.success) {
                             this.userList = [...this.userList, result.user];
-                            alert(`Created ${result.user.username}`)
                             this.form = {...emptyForm};
+                            alert(`Created ${result.user.username}`);
+                        } else if (this.isEditMode && result.success) {
+                            this.userList = this.userList.map(user => user.id === result.user.id ? result.user : user);
+                            alert(`Updated ${result.user.username}`);
                         } else if (result.uniqueViolation) {
                             alert(`${this.form.username} is already exist`);
                         }
                         this.submitting = false
+                    },
+                    showEditModal(user) {
+                        this.isEditMode = true;
+                        this.form = {...user};
+                        $("#myModal").modal('show');
+                    },
+                    showCreateModal() {
+                        this.isEditMode = false;
+                        this.form = {...emptyForm};
+                        $("#myModal").modal('show')
                     }
                 }
             })

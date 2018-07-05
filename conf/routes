@@ -4,7 +4,7 @@ GET         /                                                            control
 #TODO: Split controller
 GET         /signin                                                      controllers.HomeController.signIn
 GET         /management/user                                             controllers.UserController.managementUserList
-POST        /management/user                                             controllers.UserController.createUser
+POST        /management/user                                             controllers.UserController.upsertUser
 GET         /gentable/user                                               controllers.UserController.createTable
 GET         /management/user/delete/:id                                  controllers.UserController.deleteUser(id: Long)
 GET         /management/evaluation                                       controllers.HomeController.managementEvaluationList
