@@ -3,11 +3,8 @@ package dao
 import javax.inject.Inject
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
-
 import scala.concurrent.{ExecutionContext, Future}
 import models.User
-
-import scala.util.Try
 
 class UserDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
 
@@ -23,11 +20,12 @@ class UserDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
 
   def delete(id: Long): Future[Int] = db.run(Users.filter(_.id === id).delete)
 
-  // .map(u => user.copy(id = u.get.id))
-  def upsert(user: User) = db.run((Users returning Users).insertOrUpdate(user)).map {
+  def upsert(user: User): Future[User] = db.run((Users returning Users).insertOrUpdate(user)).map {
     case None => user
-    case u => user.copy(id = u.get.id)
+    case Some(u) => user.copy(id = u.id)
   }
+
+  def getUser(username: String, password: String): Future[Option[User]] = db.run(Users.filter(user => user.username === username && user.password === password).result.headOption)
 
   def createTable: Future[Unit] = db.run(Users.schema.create)
 
