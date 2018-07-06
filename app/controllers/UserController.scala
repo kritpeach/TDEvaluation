@@ -24,14 +24,14 @@ class UserController @Inject()(
                                 cc: ControllerComponents)
                               (implicit executionContext: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
-  val loginForm = Form(
+  val signInForm = Form(
     tuple(
       "username" -> nonEmptyText,
       "password" -> nonEmptyText
     )
   )
   def authenticate: Action[AnyContent] = Action.async { implicit request =>
-    val (username, password) = loginForm.bindFromRequest.get
+    val (username, password) = signInForm.bindFromRequest.get
     userDAO.getUser(username,password).map {
         case Some(user) => Redirect(routes.UserController.managementUserList()).withSession("uid" -> user.id.get.toString, "username" -> user.username)
         case None => Redirect(routes.UserController.signIn()).withNewSession.flashing("Login Failed" -> "Invalid username or password.")
