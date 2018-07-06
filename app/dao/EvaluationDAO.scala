@@ -3,7 +3,7 @@ package dao
 import java.sql.Timestamp
 
 import javax.inject.Inject
-import models.{Evaluation, Evaluation}
+import models.Evaluation
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
 
