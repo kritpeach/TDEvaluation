@@ -30,18 +30,26 @@ class UserController @Inject()(
       "password" -> nonEmptyText
     )
   )
-  def authenticate = Action { implicit request =>
-    loginForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(formWithErrors.data.toString()),
-      user => {
-        //userDAO.getUser(user._1,user._2).map(_ => Ok(""))
-        Ok("")
-      }
-    )
+  def authenticate: Action[AnyContent] = Action.async { implicit request =>
+    val (username, password) = loginForm.bindFromRequest.get
+    userDAO.getUser(username,password).map {
+        case Some(user) => Redirect(routes.UserController.managementUserList()).withSession("uid" -> user.id.get.toString, "username" -> user.username)
+        case None => Redirect(routes.UserController.signIn()).withNewSession.flashing("Login Failed" -> "Invalid username or password.")
+    }
+  }
+
+  def signIn() = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.signin())
+  }
+
+  def signOut = Action { implicit request: Request[AnyContent] =>
+    Redirect(routes.UserController.signIn())
+      .flashing("info" -> "You are logged out.")
+      .withNewSession
   }
 
   def managementUserList(): Action[AnyContent] = Action.async { implicit request =>
-    userDAO.list.map(users => {
+    userDAO.list().map(users => {
       val userListJSON = Json.toJson(users).toString()
       Ok(views.html.managementUserList(userListJSON))
     })

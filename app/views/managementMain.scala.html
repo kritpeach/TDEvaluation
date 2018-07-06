@@ -1,4 +1,4 @@
-@(title: String)(content: Html)
+@(title: String)(content: Html)(implicit session: play.api.mvc.Session)
 
 <!DOCTYPE html>
 <html lang="en">
@@ -139,7 +139,7 @@
                         </li>
                         <li class="nav-item dropdown d-none d-xl-inline-block">
                             <a class="nav-link dropdown-toggle" id="UserDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
-                                <span class="profile-text">Hello</span>
+                                <span class="profile-text"></span>
                                 <img class="img-xs rounded-circle" src="@routes.Assets.versioned("starAdmin/images/faces/face1.jpg")" alt="Profile image">
                             </a>
                             <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
@@ -165,7 +165,7 @@
                                 <a class="dropdown-item">
                                     Check Inbox
                                 </a>
-                                <a class="dropdown-item">
+                                <a class="dropdown-item" href="@routes.UserController.signOut">
                                     Sign Out
                                 </a>
                             </div>
@@ -188,7 +188,7 @@
                                         <img src="@routes.Assets.versioned("starAdmin/images/faces/face1.jpg")" alt="profile image">
                                     </div>
                                     <div class="text-wrapper">
-                                        <p class="profile-name">Richard V.Welsh</p>
+                                        <p class="profile-name">@session.get("username")</p>
                                         <div>
                                             <small class="designation text-muted">Manager</small>
                                             <span class="status-indicator online"></span>

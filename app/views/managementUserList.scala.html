@@ -1,4 +1,4 @@
-@(userListJSON: String)(implicit request: RequestHeader)
+@(userListJSON: String)(implicit request: RequestHeader, session: play.api.mvc.Session )
 @managementMain("User management") {
     <div id="app">
         <div class="row">

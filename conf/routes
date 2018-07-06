@@ -2,7 +2,9 @@
 GET         /                                                            controllers.HomeController.index
 
 #TODO: Split controller
-GET         /signin                                                      controllers.HomeController.signIn
+GET         /signin                                                      controllers.UserController.signIn
+GET         /signOut                                                     controllers.UserController.signOut
+POST        /auth                                                        controllers.UserController.authenticate
 GET         /management/user                                             controllers.UserController.managementUserList
 POST        /management/user                                             controllers.UserController.upsertUser
 GET         /gentable/user                                               controllers.UserController.createTable
