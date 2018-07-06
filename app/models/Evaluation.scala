@@ -3,7 +3,8 @@ package models
 import java.sql.Timestamp
 
 import org.joda.time.DateTime
-import play.api.libs.json.{Json, OFormat, Reads}
+import play.api.libs.json._
+
 
 case class Evaluation(
                        id: Option[Long] = None,
