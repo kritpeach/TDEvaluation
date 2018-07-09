@@ -8,8 +8,10 @@ POST        /auth                                                        control
 GET         /management/user                                             controllers.UserController.managementUserList
 POST        /management/user                                             controllers.UserController.upsertUser
 GET         /gentable/user                                               controllers.UserController.createTable
+GET         /gentable/evaluation                                         controllers.EvaluationController.createTable
 GET         /management/user/delete/:id                                  controllers.UserController.deleteUser(id: Long)
-GET         /management/evaluation                                       controllers.HomeController.managementEvaluationList
+GET         /management/evaluation                                       controllers.EvaluationController.managementEvaluationList
+POST        /management/evaluation                                       controllers.EvaluationController.upsertEvaluation
 GET         /management/evaluation/edit/:id                              controllers.HomeController.managementEvaluationEdit(id: Long)
 GET         /management/evaluation/:id                                   controllers.HomeController.managementEvaluationView(id: Long)
 GET         /management/evaluation/:evaluationFormId/user/:userId        controllers.HomeController.managementEvaluationResponse(evaluationFormId: Long,userId: Long)

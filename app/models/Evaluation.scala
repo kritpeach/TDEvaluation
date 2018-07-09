@@ -15,6 +15,9 @@ case class Evaluation(
                      )
 
 object Evaluation {
-  implicit val evaluationFormat: OFormat[Evaluation] = Json.format[Evaluation]
-  implicit val evaluationReads: Reads[Evaluation] = Json.reads[Evaluation]
+  implicit val userFormat: OFormat[Evaluation] = Json.using[Json.WithDefaultValues].format[Evaluation]
+  implicit val userReads: Reads[Evaluation] = Json.reads[Evaluation]
+  implicit val reads: Reads[Timestamp] = Reads.of[Long] map (new Timestamp(_))
+  implicit val writes: Writes[Timestamp] = Writes { ts: Timestamp => JsString(ts.toString) }
+  implicit val formats: Format[Timestamp] = Format(reads, writes)
 }

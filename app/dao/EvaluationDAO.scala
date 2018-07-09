@@ -9,12 +9,11 @@ import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class EvaluationDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
+class EvaluationDAO @Inject()(val userDAO: UserDAO, protected val dbConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   import profile.api._
 
-  private val Evaluations = TableQuery[EvaluationsTable]
-
+  val Evaluations = TableQuery[EvaluationsTable]
   def list(): Future[Seq[Evaluation]] = db.run(Evaluations.sortBy(_.id).result)
 
   def insert(evaluation: Evaluation): Future[Evaluation] = db
@@ -29,20 +28,16 @@ class EvaluationDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProv
   }
   def createTable: Future[Unit] = db.run(Evaluations.schema.create)
 
-  private class EvaluationsTable(tag: Tag) extends Table[Evaluation](tag, "USER") {
+  class EvaluationsTable(tag: Tag) extends Table[Evaluation](tag, "Evaluation") {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-
     def title = column[String]("title")
-
     def titleIndex = index("index_title", title, unique = true)
-
     def enabled = column[Boolean]("enabled")
-
     def createAt = column[Timestamp]("create_at")
+    def creatorId = column[Long]("creator")
+    def * = (id.?, title, enabled, createAt, creatorId) <> ((Evaluation.apply _).tupled, Evaluation.unapply)
 
-    def creator = column[Long]("creator")
-
-    def * = (id.?, title, enabled, createAt, creator) <> ((Evaluation.apply _).tupled, Evaluation.unapply)
+    def creator = foreignKey("CREATOR_FK", creatorId, userDAO.Users)(_.id , onDelete=ForeignKeyAction.Cascade)
   }
 
 }
