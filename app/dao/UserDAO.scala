@@ -10,7 +10,7 @@ class UserDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
 
   import profile.api._
 
-  private val Users = TableQuery[UsersTable]
+  val Users = TableQuery[UsersTable]
 
   def list(): Future[Seq[User]] = db.run(Users.sortBy(_.username).result)
 
@@ -29,7 +29,7 @@ class UserDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
 
   def createTable: Future[Unit] = db.run(Users.schema.create)
 
-  private class UsersTable(tag: Tag) extends Table[User](tag, "USER") {
+  class UsersTable(tag: Tag) extends Table[User](tag, "USER") {
     def id = column[Long]("ID", O.PrimaryKey, O.AutoInc)
 
     def username = column[String]("USERNAME")
