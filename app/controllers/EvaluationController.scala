@@ -5,7 +5,7 @@ import javax.inject._
 import models.Evaluation
 import org.postgresql.util.PSQLException
 import play.api.i18n.I18nSupport
-import play.api.libs.json.{JsError, JsSuccess, Json}
+import play.api.libs.json._
 import play.api.mvc._
 
 import scala.concurrent.Await
@@ -31,12 +31,10 @@ class EvaluationController @Inject()(
   }
 
   def upsertEvaluation(): Action[AnyContent] = Action { implicit request =>
-    val evaluationResult = request.body.asJson.get.validate[Evaluation]
-    println("xxxxxxxxxxxx" + request.session.get("uid"))
     val uid: Long = request.session.get("uid").get.toLong
-    evaluationResult match {
-      case JsSuccess(evaluation: Evaluation, _) =>
-        evaluation.id match {
+    val evaluation = request.body.asJson.get.as[JsObject] + ("creator" -> JsNumber(uid))
+    evaluation.validate[Evaluation] match {
+      case JsSuccess(evaluation: Evaluation, _) => evaluation.id match {
           case Some(id) => ???
           case None => Try(Await.result(evaluationDAO.upsert(evaluation.copy(creator = uid)), Duration.Inf)) match {
             case Success(s) => Ok(Json.obj("success" -> true, "evaluation" -> s))
@@ -46,7 +44,7 @@ class EvaluationController @Inject()(
             }
           }
         }
-      case e: JsError => Ok(JsError.toJson(e))
+      case JsError(e) => Ok(JsError.toJson(e))
     }
   }
 
@@ -56,6 +54,6 @@ class EvaluationController @Inject()(
   }
 
   def evaluationList(): Action[AnyContent] = Action.async { implicit request =>
-    evaluationDAO.list.map(evaluation => Ok(Json.toJson(evaluation)))
+    evaluationDAO.list().map(evaluation => Ok(Json.toJson(evaluation)))
   }
 }

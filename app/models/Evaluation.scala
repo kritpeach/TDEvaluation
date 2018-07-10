@@ -1,6 +1,7 @@
 package models
 
 import java.sql.Timestamp
+import java.text.SimpleDateFormat
 
 import org.joda.time.DateTime
 import play.api.libs.json._
@@ -15,9 +16,18 @@ case class Evaluation(
                      )
 
 object Evaluation {
+  implicit val timestampFormat: Format[Timestamp] = new Format[Timestamp] {
+    val format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS'Z'")
+    def reads(json: JsValue): JsSuccess[Timestamp] = {
+      val str = json.as[String]
+      JsSuccess(new Timestamp(format.parse(str).getTime))
+    }
+    def writes(ts: Timestamp) = JsString(format.format(ts))
+  }
   implicit val userFormat: OFormat[Evaluation] = Json.using[Json.WithDefaultValues].format[Evaluation]
   implicit val userReads: Reads[Evaluation] = Json.reads[Evaluation]
-  implicit val reads: Reads[Timestamp] = Reads.of[Long] map (new Timestamp(_))
-  implicit val writes: Writes[Timestamp] = Writes { ts: Timestamp => JsString(ts.toString) }
-  implicit val formats: Format[Timestamp] = Format(reads, writes)
+  //implicit val reads: Reads[Timestamp] = Reads.of[Long] map (new Timestamp(_))
+  //implicit val writes: Writes[Timestamp] = Writes { ts: Timestamp => JsString(ts.toString) }
+  //implicit val formats: Format[Timestamp] = Format(reads, writes)
+
 }

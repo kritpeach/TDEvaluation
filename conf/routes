@@ -13,6 +13,7 @@ GET         /management/user/delete/:id                                  control
 GET         /management/evaluation                                       controllers.EvaluationController.managementEvaluationList
 POST        /management/evaluation                                       controllers.EvaluationController.upsertEvaluation
 GET         /management/evaluation/edit/:id                              controllers.HomeController.managementEvaluationEdit(id: Long)
+GET         /management/evaluation/delete/:id                            controllers.EvaluationController.deleteEvaluation(id: Long)
 GET         /management/evaluation/:id                                   controllers.HomeController.managementEvaluationView(id: Long)
 GET         /management/evaluation/:evaluationFormId/user/:userId        controllers.HomeController.managementEvaluationResponse(evaluationFormId: Long,userId: Long)
 GET         /userlist                                                    controllers.UserController.userList
