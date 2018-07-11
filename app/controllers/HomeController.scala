@@ -16,10 +16,6 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     Ok(views.html.index())
   }
 
-  def managementEvaluationEdit(id: Long) = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.managementEvaluationEdit())
-  }
-
   def managementEvaluationView(id: Long) = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.managementEvaluationView())
   }

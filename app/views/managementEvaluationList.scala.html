@@ -22,14 +22,11 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="evaluation in evaluationList">
+                                    <tr v-for="evaluation in evaluationList" v-on:click="goToEvaluationPage(evaluation.id)">
                                         <td>{{evaluation.title}}</td>
                                         <td>{{getReadAbleDate(evaluation.createAt)}}</td>
                                         <td class="text-right">
-                                            <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
-                                                <i class="mdi mdi-pencil"></i>
-                                            </button>
-                                            <button  v-on:click="remove(evaluation.id,evaluation.title)" type="button" class="btn btn-icons btn-sm btn-inverse-outline-danger">
+                                            <button v-on:click="remove(evaluation.id,evaluation.title)" type="button" class="btn btn-icons btn-sm btn-inverse-outline-danger">
                                                 <i class="mdi mdi-delete"></i>
                                             </button>
                                         </td>
@@ -89,6 +86,9 @@
                     getReadAbleDate(dateStr) {
                         return new Date(dateStr).toLocaleDateString()
                     },
+                    goToEvaluationPage(evaluationId) {
+                        window.location.href = `/management/evaluation/${evaluationId}`
+                    },
                     async remove(id, title) {
                         if (confirm(`Are you sure you want to delete ${title}?`)) {
                             await fetch(`evaluation/delete/${id}`);
@@ -109,6 +109,7 @@
                         if (result.success) {
                             this.evaluationList = [...this.evaluationList, result.evaluation];
                             this.form = {...emptyForm};
+                            $("#myModal").modal('hide');
                             alert(`Created ${result.evaluation.title}`);
                         } else if (result.uniqueViolation) {
                             alert(`${this.form.title} is already exist`);
@@ -122,4 +123,9 @@
                 }
             })
     </script>
+    <style>
+            tr {
+                cursor: pointer;
+            }
+    </style>
 }

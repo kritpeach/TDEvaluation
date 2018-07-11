@@ -14,7 +14,7 @@ libraryDependencies += "com.typesafe.play" %% "play-slick" % "3.0.3"
 
 libraryDependencies += "com.typesafe.slick" %% "slick" % "3.2.3"
 
-libraryDependencies += "com.github.tminglei" %% "slick-pg" % "0.15.5"
+libraryDependencies += "com.github.tminglei" %% "slick-pg" % "0.16.2"
 // https://mvnrepository.com/artifact/org.postgresql/postgresql
 libraryDependencies += "org.postgresql" % "postgresql" % "42.1.4"
 
