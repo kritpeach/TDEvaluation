@@ -7,7 +7,7 @@
                     <div class="card-body">
                         <h4 class="card-title float-left">@evaluation.title</h4>
                         <div class="float-right">
-                            <button data-toggle="modal" data-target="#myModal" class="btn btn-success btn-block">
+                            <button v-on:click="showCreateModal" class="btn btn-success btn-block">
                                 New question
                                 <i class="mdi mdi-plus"></i>
                             </button>
@@ -26,7 +26,7 @@
                                         <td>{{q.content}}</td>
                                         <td>{{q.questionType}}</td>
                                         <td class="text-right">
-                                            <button type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
+                                            <button v-on:click="showEditModal(q)" type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
                                                 <i class="mdi mdi-pencil"></i>
                                             </button>
                                             <button v-on:click="remove(q.id, q.content)" type="button" class="btn btn-icons btn-sm btn-inverse-outline-danger">
@@ -45,7 +45,8 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">New question</h4>
+                        <h4 v-if="isEditMode" class="modal-title">Edit Question</h4>
+                        <h4 v-else class="modal-title">New Question</h4>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
@@ -98,8 +99,9 @@
                 methods: {
                     async remove(id, content) {
                         if (confirm(`Are you sure you want to delete ${content}?`)) {
-                            await fetch(`/management/question/${id}`, {
-                                method: 'delete'
+                            await fetch(`/management/question/${id}?csrfToken=@helper.CSRF.getToken.value`, {
+                                method: 'delete',
+                                credentials: 'same-origin'
                             });
                             this.questionList = this.questionList.filter(question => question.id !== id);
                         }
