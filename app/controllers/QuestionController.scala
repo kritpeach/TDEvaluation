@@ -22,7 +22,7 @@ class QuestionController @Inject()(
   def managementQuestionList(evaluationId: Long): Action[AnyContent] = Action.async { implicit request =>
     questionDAO.list(evaluationId).map(questions => {
       val questionListJSON = Json.toJson(questions).toString()
-      Await.result(evaluationDAO.getById(evaluationId),Duration.Inf) match {
+      Await.result(evaluationDAO.getById(evaluationId), Duration.Inf) match {
         case Some(evaluation) => Ok(views.html.managementQuestionList(questionListJSON, evaluation))
         case None => ???
       }
@@ -36,14 +36,11 @@ class QuestionController @Inject()(
   def upsertQuestion(): Action[AnyContent] = Action { implicit request =>
     val question = request.body.asJson.get.as[JsObject]
     question.validate[Question] match {
-      case JsSuccess(question: Question, _) => question.id match {
-        case Some(id) => ???
-        case None => Try(Await.result(questionDAO.upsert(question), Duration.Inf)) match {
-          case Success(s) => Ok(Json.obj("success" -> true, "question" -> s))
-          case Failure(e: PSQLException) => e.getSQLState match {
-            case "23505" => Ok(Json.obj("success" -> false, "uniqueViolation" -> true))
-            case _ => Ok(Json.obj("success" -> false))
-          }
+      case JsSuccess(question: Question, _) => Try(Await.result(questionDAO.upsert(question), Duration.Inf)) match {
+        case Success(s) => Ok(Json.obj("success" -> true, "question" -> s))
+        case Failure(e: PSQLException) => e.getSQLState match {
+          case "23505" => Ok(Json.obj("success" -> false, "uniqueViolation" -> true))
+          case _ => Ok(Json.obj("success" -> false))
         }
       }
       case JsError(e) => Ok(JsError.toJson(e))
