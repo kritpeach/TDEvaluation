@@ -1,4 +1,4 @@
-@(userListJSON: String)(implicit request: RequestHeader, session: play.api.mvc.Session )
+@(userListJSON: String)(implicit request: RequestHeader, session: play.api.mvc.Session)
 @managementMain("User management") {
     <div id="app">
         <div class="row">
@@ -94,21 +94,24 @@
                     isEditMode: false
                 },
                 computed: {
-                  userListSortByName() {
-                      return this.userList.sort((a,b) => {
-                          if (a.username < b.username)
-                              return -1;
-                          if (a.username > b.username)
-                              return 1;
-                          return 0;
-                      });
-                  }
+                    userListSortByName() {
+                        return this.userList.sort((a, b) => {
+                            if (a.username < b.username)
+                                return -1;
+                            if (a.username > b.username)
+                                return 1;
+                            return 0;
+                        });
+                    }
                 },
                 methods: {
                     async remove(id, username) {
                         if (confirm(`Are you sure you want to delete ${username}?`)) {
-                            await fetch(`user/delete/${id}`);
-                            this.userList = this.userList.filter(user => user.id !== id);
+                            await fetch(`user/${id}?csrfToken=@helper.CSRF.getToken.value`, {
+                                method: 'delete',
+                                credentials: 'same-origin'
+                            });
+                            this.userList = this.userList.filter(user => user.id !== id)
                         }
                     },
                     async submit() {
