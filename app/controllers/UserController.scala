@@ -5,17 +5,13 @@ import javax.inject._
 import models.User
 import org.postgresql.util.PSQLException
 import play.api.data.Form
-import play.api.data.Forms.mapping
 import play.api.data.Forms._
 import play.api.i18n.I18nSupport
 import play.api.libs.json.{JsError, JsSuccess, Json, Writes}
 import play.api.mvc._
-
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success, Try}
-// import scala.async.Async.{async, await}
-
 import scala.concurrent.ExecutionContext
 
 @Singleton
@@ -36,7 +32,7 @@ class UserController @Inject()(
     userDAO.getUser(username, password).map {
       case Some(user) => user.isManager match {
         case true => Redirect(routes.UserController.managementUserList()).withSession("uid" -> user.id.get.toString, "username" -> user.username)
-        case _ => Redirect(routes.EvaluationController.toEvaluation()).withSession("uid" -> user.id.get.toString, "username" -> user.username)
+        case _ => Redirect(routes.EvaluationController.evaluation()).withSession("uid" -> user.id.get.toString, "username" -> user.username)
       }
       case None => Redirect(routes.UserController.signIn()).withNewSession.flashing("Login Failed" -> "Invalid username or password.")
     }
