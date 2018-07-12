@@ -1,0 +1,8 @@
+@(evaluationList: Seq[Evaluation])
+@main("To evaluate") {
+  <ul>
+  @for(evaluation <- evaluationList) {
+    <li>@evaluation.title</li>
+  }
+  </ul>
+}
