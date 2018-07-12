@@ -15,8 +15,8 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class EvaluationController @Inject()(
-                                evaluationDAO: EvaluationDAO,
-                                cc: ControllerComponents)
+                                      evaluationDAO: EvaluationDAO,
+                                      cc: ControllerComponents)
                                     (implicit executionContext: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
   def managementEvaluationList(): Action[AnyContent] = Action.async { implicit request =>
@@ -53,8 +53,7 @@ class EvaluationController @Inject()(
   def evaluationList(): Action[AnyContent] = Action.async { implicit request =>
     evaluationDAO.list().map(evaluation => Ok(Json.toJson(evaluation)))
   }
-
-  def toEvaluation: Action[AnyContent] = Action { implicit request =>
-    Ok("toEvaluation")
+  def evaluation(): Action[AnyContent] = Action.async { implicit request =>
+    evaluationDAO.list(true).map(evaluationList => Ok(views.html.evaluation(evaluationList)))
   }
 }

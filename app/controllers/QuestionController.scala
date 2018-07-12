@@ -55,4 +55,9 @@ class QuestionController @Inject()(
   def questionList(): Action[AnyContent] = Action.async { implicit request =>
     questionDAO.list().map(question => Ok(Json.toJson(question)))
   }
+
+  def askQuestion(id: Long): Action[AnyContent] = Action.async { implicit request =>
+    // QuestionType.Score
+    questionDAO.getById(id).map(question => Ok(views.html.askQuestion(question.get)))
+  }
 }
