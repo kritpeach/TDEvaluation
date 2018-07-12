@@ -30,11 +30,15 @@ class UserController @Inject()(
       "password" -> nonEmptyText
     )
   )
+
   def authenticate: Action[AnyContent] = Action.async { implicit request =>
     val (username, password) = signInForm.bindFromRequest.get
-    userDAO.getUser(username,password).map {
-        case Some(user) => Redirect(routes.UserController.managementUserList()).withSession("uid" -> user.id.get.toString, "username" -> user.username)
-        case None => Redirect(routes.UserController.signIn()).withNewSession.flashing("Login Failed" -> "Invalid username or password.")
+    userDAO.getUser(username, password).map {
+      case Some(user) => user.isManager match {
+        case true => Redirect(routes.UserController.managementUserList()).withSession("uid" -> user.id.get.toString, "username" -> user.username)
+        case _ => Redirect(routes.EvaluationController.toEvaluation()).withSession("uid" -> user.id.get.toString, "username" -> user.username)
+      }
+      case None => Redirect(routes.UserController.signIn()).withNewSession.flashing("Login Failed" -> "Invalid username or password.")
     }
   }
 
