@@ -91,7 +91,11 @@
                     },
                     async remove(id, title) {
                         if (confirm(`Are you sure you want to delete ${title}?`)) {
-                            await fetch(`evaluation/delete/${id}`);
+
+                            await fetch(`evaluation/${id}?csrfToken=@helper.CSRF.getToken.value`, {
+                                method: 'delete',
+                                credentials: 'same-origin'
+                            });
                             this.evaluationList = this.evaluationList.filter(evaluation => evaluation.id !== id);
                         }
                     },

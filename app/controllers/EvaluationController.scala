@@ -34,16 +34,13 @@ class EvaluationController @Inject()(
     val uid: Long = request.session.get("uid").get.toLong
     val evaluation = request.body.asJson.get.as[JsObject] + ("creator" -> JsNumber(uid))
     evaluation.validate[Evaluation] match {
-      case JsSuccess(evaluation: Evaluation, _) => evaluation.id match {
-          case Some(id) => ???
-          case None => Try(Await.result(evaluationDAO.upsert(evaluation.copy(creator = uid)), Duration.Inf)) match {
-            case Success(s) => Ok(Json.obj("success" -> true, "evaluation" -> s))
-            case Failure(e: PSQLException) => e.getSQLState match {
-              case "23505" => Ok(Json.obj("success" -> false, "uniqueViolation" -> true))
-              case _ => Ok(Json.obj("success" -> false))
-            }
-          }
+      case JsSuccess(evaluation: Evaluation, _) => Try(Await.result(evaluationDAO.upsert(evaluation.copy(creator = uid)), Duration.Inf)) match {
+        case Success(s) => Ok(Json.obj("success" -> true, "evaluation" -> s))
+        case Failure(e: PSQLException) => e.getSQLState match {
+          case "23505" => Ok(Json.obj("success" -> false, "uniqueViolation" -> true))
+          case _ => Ok(Json.obj("success" -> false))
         }
+      }
       case JsError(e) => Ok(JsError.toJson(e))
     }
   }
@@ -55,5 +52,9 @@ class EvaluationController @Inject()(
 
   def evaluationList(): Action[AnyContent] = Action.async { implicit request =>
     evaluationDAO.list().map(evaluation => Ok(Json.toJson(evaluation)))
+  }
+
+  def toEvaluation: Action[AnyContent] = Action { implicit request =>
+    Ok("toEvaluation")
   }
 }
