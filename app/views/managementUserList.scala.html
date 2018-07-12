@@ -116,7 +116,7 @@
                     },
                     async submit() {
                         this.submitting = true
-                        const response = await fetch("@routes.UserController.upsertUser()", {
+                        const response = await fetch("@helper.CSRF(routes.UserController.upsertUser())", {
                             method: "POST",
                             body: JSON.stringify(this.form),
                             headers: {
