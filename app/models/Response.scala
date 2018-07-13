@@ -3,9 +3,10 @@ package models
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
+import org.joda.time.DateTime
 import play.api.libs.json._
 
-case class Response(id: Option[Long] = None, answer: String, createAt: Timestamp, creatorId: Long, questionId: Long)
+case class Response(id: Option[Long] = None, answer: String, createAt: Timestamp = new Timestamp(DateTime.now.getMillis), creatorId: Long, questionId: Long)
 
 object Response {
   implicit val timestampFormat: Format[Timestamp] = new Format[Timestamp] {

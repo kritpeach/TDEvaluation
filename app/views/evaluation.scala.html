@@ -1,8 +1,9 @@
-@(evaluationList: Seq[Evaluation])
+@(evaluationList: Seq[Evaluation])(implicit session: play.api.mvc.Session)
 @main("To evaluate") {
-  <ul>
-  @for(evaluation <- evaluationList) {
-    <li>@evaluation.title</li>
-  }
-  </ul>
+    Hi, @session.get("username")
+    <ul>
+    @for(evaluation <- evaluationList) {
+        <li>@evaluation.title</li>
+    }
+    </ul>
 }

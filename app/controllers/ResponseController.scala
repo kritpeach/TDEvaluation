@@ -1,9 +1,11 @@
 package controllers
 
-import dao.ResponseDAO
+import dao.{QuestionDAO, ResponseDAO}
 import javax.inject._
 import models.Response
 import org.postgresql.util.PSQLException
+import play.api.data.Form
+import play.api.data.Forms._
 import play.api.i18n.I18nSupport
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc._
@@ -14,35 +16,38 @@ import scala.util.{Failure, Success, Try}
 
 @Singleton
 class ResponseController @Inject()(
-                                responseDAO: ResponseDAO,
-                                cc: ControllerComponents)
+                                    responseDAO: ResponseDAO,
+                                    questionDAO: QuestionDAO,
+                                    cc: ControllerComponents)
                                   (implicit executionContext: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
-
-//  def managementResponseList(): Action[AnyContent] = Action.async { implicit request =>
-//    responseDAO.list().map(responses => {
-//      val responseListJSON = Json.toJson(responses).toString()
-//      Ok(views.html.managementResponseList(responseListJSON))
-//    })
-//  }
+  val responseForm = Form(
+    tuple(
+      "questionId" -> longNumber,
+      "answer" -> nonEmptyText
+    )
+  )
+  //  def managementResponseList(): Action[AnyContent] = Action.async { implicit request =>
+  //    responseDAO.list().map(responses => {
+  //      val responseListJSON = Json.toJson(responses).toString()
+  //      Ok(views.html.managementResponseList(responseListJSON))
+  //    })
+  //  }
 
   def deleteResponse(id: Long): Action[AnyContent] = Action.async { implicit request =>
     responseDAO.delete(id).map(x => Ok(Json.toJson(x)))
   }
 
-  def upsertResponse(): Action[AnyContent] = Action { implicit request =>
-    val responseResult = request.body.asJson.get.validate[Response]
-    responseResult match {
-      case JsSuccess(response: Response, _) =>
-        Try(Await.result(responseDAO.upsert(response), Duration.Inf)) match {
-          case Success(u) => Ok(Json.obj("success" -> true, "response" -> u))
-          case Failure(e: PSQLException) => e.getSQLState match {
-            case "23505" => Ok(Json.obj("success" -> false, "uniqueViolation" -> true))
-            case _ => Ok(Json.obj("success" -> false))
-          }
-        }
-      case e: JsError => Ok(JsError.toJson(e))
-    }
+  def upsertResponse(): Action[AnyContent] = Action.async { implicit request =>
+    val (questionId: Long, answer: String) = responseForm.bindFromRequest.get
+    val creatorId: Long = request.session.get("uid").get.toLong
+    val response: Response = Response(answer = answer, creatorId = creatorId, questionId = questionId)
+    val upsertedResponse = Await.result(responseDAO.upsert(response), Duration.Inf)
+    val question = Await.result(questionDAO.getById(questionId), Duration.Inf)
+    questionDAO.getNextQuestion(upsertedResponse.questionId, question.get.evaluationId).map({
+      case Some(q) => Ok(views.html.askQuestion(q))
+      case None => Ok("No more question")
+    })
   }
 
   def createTable() = Action {
