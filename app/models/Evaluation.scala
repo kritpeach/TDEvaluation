@@ -24,6 +24,6 @@ object Evaluation {
     }
     def writes(ts: Timestamp) = JsString(format.format(ts))
   }
-  implicit val userFormat: OFormat[Evaluation] = Json.using[Json.WithDefaultValues].format[Evaluation]
-  implicit val userReads: Reads[Evaluation] = Json.reads[Evaluation]
+  implicit val evaluationFormat: OFormat[Evaluation] = Json.using[Json.WithDefaultValues].format[Evaluation]
+  implicit val evaluationReads: Reads[Evaluation] = Json.reads[Evaluation]
 }
