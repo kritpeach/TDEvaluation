@@ -17,6 +17,7 @@ class QuestionDAO @Inject()(val evaluationDAO: EvaluationDAO, protected val dbCo
   def list(): Future[Seq[Question]] = db.run(Questions.sortBy(_.id).result)
   def list(evaluationId: Long): Future[Seq[Question]] = db.run(Questions.filter(_.evaluationId === evaluationId).result)
   def getById(id: Long): Future[Option[Question]] = db.run(Questions.filter(_.id === id).result.headOption)
+  def getFirst(evaluationId: Long): Future[Option[Question]] = db.run(Questions.filter(_.evaluationId === evaluationId).sortBy(_.id).take(1).result.headOption)
   def getNextQuestion(questionId: Long, evaluationId: Long): Future[Option[Question]] = db.run(Questions
     .filter(_.evaluationId === evaluationId)
       .filter(_.id > questionId)
