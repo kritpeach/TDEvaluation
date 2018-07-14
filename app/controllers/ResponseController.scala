@@ -11,6 +11,7 @@ import play.api.mvc._
 
 import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.Duration
+
 @Singleton
 class ResponseController @Inject()(
                                     responseDAO: ResponseDAO,
@@ -44,8 +45,12 @@ class ResponseController @Inject()(
     val question = Await.result(questionDAO.getById(questionId), Duration.Inf)
     questionDAO.getNextQuestion(upsertedResponse.questionId, question.get.evaluationId).map({
       case Some(q) => Redirect(routes.QuestionController.askQuestion(q.id.get))
-      case None => Ok("No more question")
+      case None => Redirect(routes.ResponseController.complete())
     })
+  }
+
+  def complete() = Action { implicit request =>
+    Ok(views.html.complete())
   }
 
   def createTable() = Action {
