@@ -32,7 +32,7 @@ class UserController @Inject()(
     userDAO.getUser(username, password).map {
       case Some(user) => user.isManager match {
         case true => Redirect(routes.UserController.managementUserList()).withSession("uid" -> user.id.get.toString, "username" -> user.username)
-        case _ => Redirect(routes.EvaluationController.evaluation()).withSession("uid" -> user.id.get.toString, "username" -> user.username)
+        case _ => Redirect(routes.EvaluationController.staffEvaluation()).withSession("uid" -> user.id.get.toString, "username" -> user.username)
       }
       case None => Redirect(routes.UserController.signIn()).withNewSession.flashing("Login Failed" -> "Invalid username or password.")
     }
@@ -80,6 +80,6 @@ class UserController @Inject()(
   }
 
   def userList(): Action[AnyContent] = Action.async { implicit request =>
-    userDAO.list.map(user => Ok(Json.toJson(user)))
+    userDAO.list().map(user => Ok(Json.toJson(user)))
   }
 }

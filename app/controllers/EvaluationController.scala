@@ -1,6 +1,6 @@
 package controllers
 
-import dao.EvaluationDAO
+import dao.{EvaluationDAO, QuestionDAO}
 import javax.inject._
 import models.Evaluation
 import org.postgresql.util.PSQLException
@@ -16,6 +16,7 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class EvaluationController @Inject()(
                                       evaluationDAO: EvaluationDAO,
+                                      questionDAO: QuestionDAO,
                                       cc: ControllerComponents)
                                     (implicit executionContext: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
@@ -53,7 +54,11 @@ class EvaluationController @Inject()(
   def evaluationList(): Action[AnyContent] = Action.async { implicit request =>
     evaluationDAO.list().map(evaluation => Ok(Json.toJson(evaluation)))
   }
-  def evaluation(): Action[AnyContent] = Action.async { implicit request =>
+  def staffEvaluation(): Action[AnyContent] = Action.async { implicit request =>
     evaluationDAO.list(true).map(evaluationList => Ok(views.html.evaluation(evaluationList)))
+  }
+
+  def evaluation(id: Long): Action[AnyContent] = Action.async { implicit request =>
+    questionDAO.getFirst(id).map(question => Redirect(routes.QuestionController.askQuestion(question.get.id.get)))
   }
 }
