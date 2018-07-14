@@ -1,14 +1,14 @@
 package controllers
 
-import dao.{EvaluationDAO, QuestionDAO}
+import dao.{EvaluationDAO, QuestionDAO, ResponseDAO}
 import javax.inject._
-import models.Question
+import models.{Question, Response}
 import org.postgresql.util.PSQLException
 import play.api.i18n.I18nSupport
 import play.api.libs.json._
 import play.api.mvc._
 
-import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success, Try}
 
@@ -16,6 +16,7 @@ import scala.util.{Failure, Success, Try}
 class QuestionController @Inject()(
                                     questionDAO: QuestionDAO,
                                     evaluationDAO: EvaluationDAO,
+                                    responseDAO: ResponseDAO,
                                     cc: ControllerComponents)
                                   (implicit executionContext: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
@@ -57,7 +58,8 @@ class QuestionController @Inject()(
   }
 
   def askQuestion(id: Long): Action[AnyContent] = Action.async { implicit request =>
-    // QuestionType.Score
-    questionDAO.getById(id).map(question => Ok(views.html.askQuestion(question.get)))
+    val uid: Long = request.session.get("uid").get.toLong
+    val existingResponse: Option[Response] = Await.result(responseDAO.get(uid,id),Duration.Inf)
+    questionDAO.getById(id).map(question => Ok(views.html.askQuestion(question.get,existingResponse)))
   }
 }

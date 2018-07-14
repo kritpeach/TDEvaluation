@@ -3,17 +3,14 @@ package controllers
 import dao.{QuestionDAO, ResponseDAO}
 import javax.inject._
 import models.Response
-import org.postgresql.util.PSQLException
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.I18nSupport
-import play.api.libs.json.{JsError, JsSuccess, Json}
+import play.api.libs.json.Json
 import play.api.mvc._
 
 import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.Duration
-import scala.util.{Failure, Success, Try}
-
 @Singleton
 class ResponseController @Inject()(
                                     responseDAO: ResponseDAO,
@@ -23,6 +20,7 @@ class ResponseController @Inject()(
 
   val responseForm = Form(
     tuple(
+      "responseId" -> optional(longNumber),
       "questionId" -> longNumber,
       "answer" -> nonEmptyText
     )
@@ -39,13 +37,13 @@ class ResponseController @Inject()(
   }
 
   def upsertResponse(): Action[AnyContent] = Action.async { implicit request =>
-    val (questionId: Long, answer: String) = responseForm.bindFromRequest.get
+    val (responseId: Option[Long], questionId: Long, answer: String) = responseForm.bindFromRequest.get
     val creatorId: Long = request.session.get("uid").get.toLong
-    val response: Response = Response(answer = answer, creatorId = creatorId, questionId = questionId)
+    val response: Response = Response(id = responseId, answer = answer, creatorId = creatorId, questionId = questionId)
     val upsertedResponse = Await.result(responseDAO.upsert(response), Duration.Inf)
     val question = Await.result(questionDAO.getById(questionId), Duration.Inf)
     questionDAO.getNextQuestion(upsertedResponse.questionId, question.get.evaluationId).map({
-      case Some(q) => Ok(views.html.askQuestion(q))
+      case Some(q) => Redirect(routes.QuestionController.askQuestion(q.id.get))
       case None => Ok("No more question")
     })
   }

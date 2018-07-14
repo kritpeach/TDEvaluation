@@ -19,6 +19,12 @@ class ResponseDAO @Inject()(val userDAO: UserDAO, val questionDAO: QuestionDAO, 
 
   def getById(id: Long): Future[Option[Response]] = db.run(Responses.filter(_.id === id).result.headOption)
 
+  def get(userId: Long, questionId: Long): Future[Option[Response]] = db.run(Responses
+    .filter(_.creatorId === userId)
+    .filter(_.questionId === questionId)
+    .result.headOption
+  )
+
   def insert(response: Response): Future[Response] = db
     .run(Responses returning Responses.map(_.id) += response)
     .map(id => response.copy(id = Some(id)))
@@ -46,8 +52,10 @@ class ResponseDAO @Inject()(val userDAO: UserDAO, val questionDAO: QuestionDAO, 
     def * = (id.?, answer, createAt, creatorId, questionId) <> ((Response.apply _).tupled, Response.unapply)
 
     def idx = index("idx", (creatorId, questionId), unique = true)
+
     def creatorFK = foreignKey("CREATOR_FK", creatorId, userDAO.Users)(_.id, onDelete = ForeignKeyAction.Cascade)
-    def questionFK = foreignKey("QUESTION_FK",questionId,questionDAO.Questions)(_.id, onDelete = ForeignKeyAction.Cascade)
+
+    def questionFK = foreignKey("QUESTION_FK", questionId, questionDAO.Questions)(_.id, onDelete = ForeignKeyAction.Cascade)
   }
 
 }
