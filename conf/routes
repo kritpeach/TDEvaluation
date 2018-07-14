@@ -19,9 +19,10 @@ DELETE        /management/question/:id                                     contr
 DELETE        /management/evaluation/:id                                   controllers.EvaluationController.deleteEvaluation(id: Long)
 GET           /management/evaluation/:evaluationFormId/user/:userId        controllers.HomeController.managementEvaluationResponse(evaluationFormId: Long,userId: Long)
 GET           /userlist                                                    controllers.UserController.userList
-GET           /evaluation                                                  controllers.EvaluationController.evaluation
+GET           /evaluation                                                  controllers.EvaluationController.staffEvaluation
+GET           /evaluation/:id                                              controllers.EvaluationController.evaluation(id: Long)
 GET           /askQuestion/:id                                             controllers.QuestionController.askQuestion(id: Long)
 POST          /submitResponse                                              controllers.ResponseController.upsertResponse
-GET           /complete                                                        controllers.ResponseController.complete
+GET           /complete                                                    controllers.ResponseController.complete
 # Map static resources from the /public folder to the /assets URL path
 GET           /assets/*file                                                controllers.Assets.versioned(path="/public", file: Asset)
