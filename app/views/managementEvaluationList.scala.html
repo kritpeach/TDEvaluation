@@ -22,10 +22,13 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="evaluation in evaluationList" v-on:click="goToEvaluationPage(evaluation.id)">
+                                    <tr v-for="evaluation in evaluationList" v-on:click="goToEvaluationViewPage(evaluation.id)">
                                         <td>{{evaluation.title}}</td>
                                         <td>{{getReadAbleDate(evaluation.createAt)}}</td>
                                         <td class="text-right">
+                                            <button v-on:click="goToEvaluationEditPage(evaluation.id)" type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
+                                                <i class="mdi mdi-pencil"></i>
+                                            </button>
                                             <button v-on:click="remove(evaluation.id,evaluation.title)" type="button" class="btn btn-icons btn-sm btn-inverse-outline-danger">
                                                 <i class="mdi mdi-delete"></i>
                                             </button>
@@ -86,7 +89,10 @@
                     getReadAbleDate(dateStr) {
                         return new Date(dateStr).toLocaleDateString()
                     },
-                    goToEvaluationPage(evaluationId) {
+                    goToEvaluationEditPage(evaluationId) {
+                        window.location.href = `/management/evaluation/${evaluationId}/edit`
+                    },
+                    goToEvaluationViewPage(evaluationId) {
                         window.location.href = `/management/evaluation/${evaluationId}`
                     },
                     async remove(id, title) {

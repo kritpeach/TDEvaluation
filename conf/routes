@@ -12,14 +12,15 @@ GET           /gentable/question                                           contr
 GET           /gentable/response                                           controllers.ResponseController.createTable
 DELETE        /management/user/:id                                         controllers.UserController.deleteUser(id: Long)
 GET           /management/evaluation                                       controllers.EvaluationController.managementEvaluationList
+GET           /management/evaluation/:id                                   controllers.EvaluationController.managementEvaluationView(id: Long)
 POST          /management/evaluation                                       controllers.EvaluationController.upsertEvaluation
-GET           /management/evaluation/:id                                   controllers.QuestionController.managementQuestionList(id: Long)
+GET           /management/evaluation/:id/edit                              controllers.QuestionController.managementQuestionList(id: Long)
 POST          /management/question                                         controllers.QuestionController.upsertQuestion
 DELETE        /management/question/:id                                     controllers.QuestionController.deleteQuestion(id: Long)
 DELETE        /management/evaluation/:id                                   controllers.EvaluationController.deleteEvaluation(id: Long)
 GET           /management/evaluation/:evaluationFormId/user/:userId        controllers.HomeController.managementEvaluationResponse(evaluationFormId: Long,userId: Long)
 GET           /userlist                                                    controllers.UserController.userList
-GET           /evaluation                                                  controllers.EvaluationController.staffEvaluation
+GET           /evaluation                                                  controllers.EvaluationController.assessorEvaluation
 GET           /evaluation/:id                                              controllers.EvaluationController.evaluation(id: Long)
 GET           /askQuestion/:id                                             controllers.QuestionController.askQuestion(id: Long)
 POST          /submitResponse                                              controllers.ResponseController.upsertResponse
