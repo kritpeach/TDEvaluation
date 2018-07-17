@@ -10,6 +10,7 @@ GET           /gentable/user                                               contr
 GET           /gentable/evaluation                                         controllers.EvaluationController.createTable
 GET           /gentable/question                                           controllers.QuestionController.createTable
 GET           /gentable/response                                           controllers.ResponseController.createTable
+GET           /gentable/comment                                            controllers.CommentController.createTable
 DELETE        /management/user/:id                                         controllers.UserController.deleteUser(id: Long)
 GET           /management/evaluation                                       controllers.EvaluationController.managementEvaluationList
 GET           /management/evaluation/:id                                   controllers.EvaluationController.managementEvaluationView(id: Long)
