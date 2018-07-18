@@ -1,141 +1,142 @@
 @(evaluationListJSON: String)(implicit session: play.api.mvc.Session, request: play.api.mvc.RequestHeader)
-@managementMain("Evaluation management") {
-    <div id="app">
-        <div class="row">
-            <div class="col-lg-12 grid-margin stretch-card">
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title float-left">Evaluation management</h4>
-                        <div class="float-right">
-                            <button data-toggle="modal" data-target="#myModal" class="btn btn-success btn-block">
-                                New evaluation form
-                                <i class="mdi mdi-plus"></i>
-                            </button>
+    @managementMain("Evaluation management") {
+        <div id="app">
+            <div class="row">
+                <div class="col-lg-12 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title float-left">Evaluation management</h4>
+                            <div class="float-right">
+                                <button data-toggle="modal" data-target="#myModal" class="btn btn-success btn-block">
+                                    New evaluation form
+                                    <i class="mdi mdi-plus"></i>
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Topic</th>
+                                            <th>Created date</th>
+                                            <th class="text-right">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="evaluation in evaluationList">
+                                            <td v-on:click="goToEvaluationViewPage(evaluation.id)">{{evaluation.title}}</td>
+                                            <td v-on:click="goToEvaluationViewPage(evaluation.id)">{{getReadAbleDate(evaluation.createAt)}}</td>
+                                            <td class="text-right">
+                                                <button v-on:click="goToEvaluationEditPage(evaluation.id)" type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
+                                                    <i class="mdi mdi-pencil"></i>
+                                                </button>
+                                                <button v-on:click="remove(evaluation.id,evaluation.title)" type="button" class="btn btn-icons btn-sm btn-inverse-outline-danger">
+                                                    <i class="mdi mdi-delete"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Topic</th>
-                                        <th>Created date</th>
-                                        <th class="text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="evaluation in evaluationList" v-on:click="goToEvaluationViewPage(evaluation.id)">
-                                        <td>{{evaluation.title}}</td>
-                                        <td>{{getReadAbleDate(evaluation.createAt)}}</td>
-                                        <td class="text-right">
-                                            <button v-on:click="goToEvaluationEditPage(evaluation.id)" type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
-                                                <i class="mdi mdi-pencil"></i>
-                                            </button>
-                                            <button v-on:click="remove(evaluation.id,evaluation.title)" type="button" class="btn btn-icons btn-sm btn-inverse-outline-danger">
-                                                <i class="mdi mdi-delete"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal" id="myModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">New evaluation form</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Evaluation topic</label>
+                                <input v-model="form.title" type="text" class="form-control" placeholder="Enter evaluation topic">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button v-on:click="submit" :disabled="submitting" class="btn btn-success mr-2">
+                                <i v-if="submitting" class="mdi mdi-refresh mdi-spin"></i>Submit</button>
+                            <button class="btn btn-light" data-dismiss="modal">Cancel</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="modal" id="myModal">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">New evaluation form</h4>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label>Evaluation topic</label>
-                            <input v-model="form.title" type="text" class="form-control" placeholder="Enter evaluation topic">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button v-on:click="submit" :disabled="submitting" class="btn btn-success mr-2">
-                            <i v-if="submitting" class="mdi mdi-refresh mdi-spin"></i>Submit</button>
-                        <button class="btn btn-light" data-dismiss="modal">Cancel</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-            const emptyForm = {
-                id: null,
-                title: '',
-            };
-            new Vue({
-                el: '#app',
-                data: {
-                    evaluationList: @Html(evaluationListJSON),
-                    form: {...emptyForm},
-                    submitting: false
-                },
-                computed: {
-                    evaluationListSortByName() {
-                        return this.evaluationList.sort((a, b) => {
-                            if (a.title < b.title)
-                                return -1;
-                            if (a.title > b.title)
-                                return 1;
-                            return 0;
-                        });
-                    }
-                },
-                methods: {
-                    getReadAbleDate(dateStr) {
-                        return new Date(dateStr).toLocaleDateString()
+        <script>
+            // TODO: Fix incorrect edit link when create evaluation and rename
+                const emptyForm = {
+                    id: null,
+                    title: '',
+                };
+                new Vue({
+                    el: '#app',
+                    data: {
+                        evaluationList: @Html(evaluationListJSON),
+                        form: {...emptyForm},
+                        submitting: false
                     },
-                    goToEvaluationEditPage(evaluationId) {
-                        window.location.href = `/management/evaluation/${evaluationId}/edit`
-                    },
-                    goToEvaluationViewPage(evaluationId) {
-                        window.location.href = `/management/evaluation/${evaluationId}`
-                    },
-                    async remove(id, title) {
-                        if (confirm(`Are you sure you want to delete ${title}?`)) {
-
-                            await fetch(`evaluation/${id}?csrfToken=@helper.CSRF.getToken.value`, {
-                                method: 'delete',
-                                credentials: 'same-origin'
+                    computed: {
+                        evaluationListSortByName() {
+                            return this.evaluationList.sort((a, b) => {
+                                if (a.title < b.title)
+                                    return -1;
+                                if (a.title > b.title)
+                                    return 1;
+                                return 0;
                             });
-                            this.evaluationList = this.evaluationList.filter(evaluation => evaluation.id !== id);
                         }
                     },
-                    async submit() {
-                        this.submitting = true;
-                        const response = await fetch("@helper.CSRF(routes.EvaluationController.upsertEvaluation)", {
-                            method: "POST",
-                            credentials: 'same-origin',
-                            body: JSON.stringify(this.form),
-                            headers: {
-                                'Content-Type': 'application/json'
+                    methods: {
+                        getReadAbleDate(dateStr) {
+                            return new Date(dateStr).toLocaleDateString()
+                        },
+                        goToEvaluationEditPage(evaluationId) {
+                            window.location.href = `/management/evaluation/${evaluationId}/edit`
+                        },
+                        goToEvaluationViewPage(evaluationId) {
+                            window.location.href = `/management/evaluation/${evaluationId}`
+                        },
+                        async remove(id, title) {
+                            if (confirm(`Are you sure you want to delete ${title}?`)) {
+
+                                await fetch(`evaluation/${id}?csrfToken=@helper.CSRF.getToken.value`, {
+                                    method: 'delete',
+                                    credentials: 'same-origin'
+                                });
+                                this.evaluationList = this.evaluationList.filter(evaluation => evaluation.id !== id);
                             }
-                        });
-                        const result = await response.json();
-                        if (result.success) {
-                            this.evaluationList = [...this.evaluationList, result.evaluation];
+                        },
+                        async submit() {
+                            this.submitting = true;
+                            const response = await fetch("@helper.CSRF(routes.EvaluationController.upsertEvaluation)", {
+                                method: "POST",
+                                credentials: 'same-origin',
+                                body: JSON.stringify(this.form),
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+                            const result = await response.json();
+                            if (result.success) {
+                                this.evaluationList = [...this.evaluationList, result.evaluation];
+                                this.form = {...emptyForm};
+                                $("#myModal").modal('hide');
+                                alert(`Created ${result.evaluation.title}`);
+                            } else if (result.uniqueViolation) {
+                                alert(`${this.form.title} is already exist`);
+                            }
+                            this.submitting = false
+                        },
+                        showCreateModal() {
                             this.form = {...emptyForm};
-                            $("#myModal").modal('hide');
-                            alert(`Created ${result.evaluation.title}`);
-                        } else if (result.uniqueViolation) {
-                            alert(`${this.form.title} is already exist`);
+                            $("#myModal").modal('show')
                         }
-                        this.submitting = false
-                    },
-                    showCreateModal() {
-                        this.form = {...emptyForm};
-                        $("#myModal").modal('show')
                     }
+                })
+        </script>
+        <style>
+                tr {
+                    cursor: pointer;
                 }
-            })
-    </script>
-    <style>
-            tr {
-                cursor: pointer;
-            }
-    </style>
-}
+        </style>
+    }

@@ -1,5 +1,5 @@
 @(evaluationList: Seq[Evaluation])(implicit session: play.api.mvc.Session)
-    @main("To evaluate") {
+    @main("Evaluation") {
         <div class="container-scroller">
             <div class="container-fluid page-body-wrapper full-page-wrapper auth-page">
                 <div class="content-wrapper d-flex align-items-center text-center error-page bg-primary">
@@ -7,13 +7,13 @@
                         <div class="col-lg-7 mx-auto text-white">
                             <div class="row mt-5">
                                 <div class="col-12 text-center mt-xl-2">
-                                    <h3>Here are evaluation for @session.get("username")</h3>
+                                    <h3>Evaluation for @session.get("username")</h3>
                                 </div>
                             </div>
                             <div class="row mt-5">
                                 <div class="col-12 text-center mt-xl-2">
                                 @for(evaluation <- evaluationList) {
-                                    <a class="text-white font-weight-medium" href="@routes.EvaluationController.evaluation(evaluation.id.get)"><h2>@evaluation.title</h2></a>
+                                    <a class="text-white font-weight-medium" href="@routes.EvaluationController.evaluation(evaluation.id.get)"><h2> · @evaluation.title</h2></a>
                                 }
                                 </div>
                             </div>

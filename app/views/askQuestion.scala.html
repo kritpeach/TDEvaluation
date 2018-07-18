@@ -12,21 +12,22 @@
                                 @if(response.isDefined) {
                                     <input type="hidden" name="responseId" value="@response.get.id">
                                 }
-                                @if(question.questionType.equals(QuestionType.Score)){
-                                <div class="form-group">
-                                    @for(score <- 1 to 5){
-                                    <div class="form-radio">
-                                        <label class="form-check-label">
-                                            @if(response.isDefined && response.get.answer == score.toString) {
-                                                <input type="radio" value="@score" class="form-check-input" name="answer" checked>
-                                            } else {
-                                                <input type="radio" value="@score" class="form-check-input" name="answer">
-                                            }
-                                            @score
+                                @if(question.questionType.equals(QuestionType.Score)) {
+                                    <div class="form-group">
+                                    @for(score <- 1 to 5) {
+                                        <div class="form-radio">
+                                            <label class="form-check-label">
+                                                @if(response.isDefined && response.get.answer == score.toString) {
+                                                    <input type="radio" value="@score" class="form-check-input" name="answer" checked>
+                                                } else {
+                                                    <input type="radio" value="@score" class="form-check-input" name="answer">
+                                                }
+                                                @score
                                             <i class="input-helper"></i>
-                                        </label>
-                                    </div>}
-                                </div>
+                                            </label>
+                                        </div>
+                                    }
+                                    </div>
                                 } else {
                                     <div class="form-group">
                                         <input type="text" value="@response.fold("")(_.answer)" name="answer" class="form-control" id="InputAns" placeholder="Answer">
@@ -42,4 +43,9 @@
             </div>
         </div>
     </div>
+    <style>
+            h4 {
+                text-transform: none !important;
+            }
+    </style>
 }

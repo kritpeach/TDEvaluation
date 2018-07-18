@@ -4,10 +4,8 @@ import dao.CommentDAO
 import javax.inject._
 import models.Comment
 import org.postgresql.util.PSQLException
-import play.api.data.Form
-import play.api.data.Forms._
 import play.api.i18n.I18nSupport
-import play.api.libs.json.{JsError, JsSuccess, Json}
+import play.api.libs.json._
 import play.api.mvc._
 
 import scala.concurrent.{Await, ExecutionContext}
@@ -32,8 +30,9 @@ class CommentController @Inject()(
   }
 
   def upsertComment(): Action[AnyContent] = Action { implicit request =>
-    val commentResult = request.body.asJson.get.validate[Comment]
-    commentResult match {
+    val uid: Long = request.session.get("uid").get.toLong
+    val comment = request.body.asJson.get.as[JsObject] + ("userId" -> JsNumber(uid))
+    comment.validate[Comment] match {
       case JsSuccess(comment: Comment, _) =>
         Try(Await.result(commentDAO.upsert(comment), Duration.Inf)) match {
           case Success(u) => Ok(Json.obj("success" -> true, "comment" -> u))

@@ -39,6 +39,8 @@ class CommentDAO @Inject()(val userDAO: UserDAO, val responseDAO: ResponseDAO, p
 
     def * = (id.?, comment, userId, responseId) <> ((Comment.apply _).tupled, Comment.unapply)
 
+    def idx = index("commentUserResponseIndex", (userId, responseId), unique = true)
+
     def userFK = foreignKey("USER_FK", userId, userDAO.Users)(_.id, onDelete = ForeignKeyAction.Cascade)
 
     def responseFK = foreignKey("RESPONSE_FK", responseId, responseDAO.Responses)(_.id, onDelete = ForeignKeyAction.Cascade)
