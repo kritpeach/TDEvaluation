@@ -1,5 +1,5 @@
 @(evaluation: Evaluation,responseCounts: Vector[UserResponseCount])(implicit session: play.api.mvc.Session)
-    @managementMain("User management") {
+    @managementMain(s"${evaluation.title} - Assessor") {
         <div class="row">
             <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">
@@ -15,11 +15,11 @@
                                 </thead>
                                 <tbody>
                                 @for(userResponse <- responseCounts) {
-                                    <tr>
+                                    <tr onclick="window.location.href = `/management/evaluation/@evaluation.id/user/@userResponse.userId`">
                                         <td>@userResponse.username</td>
                                         <td><label class="@{
                                             if(userResponse.responseCount < userResponse.questionCount) "badge-warning" else "badge-success"
-                                        } badge">@userResponse.responseCount/@userResponse.questionCount</label>
+                                        } badge">@userResponse.responseCount / @userResponse.questionCount</label>
                                         </td>
                                     </tr>
                                 }
@@ -57,4 +57,9 @@
                 </div>
             </div>
         </div>
+        <style>
+                tr {
+                    cursor: pointer;
+                }
+        </style>
     }

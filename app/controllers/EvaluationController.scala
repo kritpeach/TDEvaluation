@@ -54,6 +54,7 @@ class EvaluationController @Inject()(
   def evaluationList(): Action[AnyContent] = Action.async { implicit request =>
     evaluationDAO.list().map(evaluation => Ok(Json.toJson(evaluation)))
   }
+
   def assessorEvaluation(): Action[AnyContent] = Action.async { implicit request =>
     evaluationDAO.list(true).map(evaluationList => Ok(views.html.evaluation(evaluationList)))
   }
@@ -61,8 +62,18 @@ class EvaluationController @Inject()(
   def evaluation(id: Long): Action[AnyContent] = Action.async { implicit request =>
     questionDAO.getFirst(id).map(question => Redirect(routes.QuestionController.askQuestion(question.get.id.get)))
   }
+
   def managementEvaluationView(id: Long): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
-    val evaluation = Await.result(evaluationDAO.getById(id),Duration.Inf).get
+    val evaluation = Await.result(evaluationDAO.getById(id), Duration.Inf).get
     evaluationDAO.userResponseCount(id).map(responseCount => Ok(views.html.managementEvaluationView(evaluation, responseCount)))
+  }
+
+  def report(): Action[AnyContent] = Action.async {
+    evaluationDAO.questionResponseJSON(1, 56).map(s => Ok(s.get))
+  }
+
+  def managementEvaluationResponse(evaluationId: Long, userId: Long): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    evaluationDAO.questionResponseJSON(evaluationId, userId).map(questionResponseJSON => Ok(views.html.managementEvaluationResponse(questionResponseJSON.get)))
+
   }
 }

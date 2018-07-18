@@ -37,7 +37,6 @@ class QuestionDAO @Inject()(val evaluationDAO: EvaluationDAO, protected val dbCo
     case Some(u) => question.copy(id = u.id)
   }
   def createTable: Future[Unit] = db.run(Questions.schema.create)
-
   class QuestionsTable(tag: Tag) extends Table[Question](tag, "Question") {
     implicit val questionTypeMapper = MappedColumnType.base[QuestionType, String](
       e => e.toString,

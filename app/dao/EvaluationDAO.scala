@@ -40,6 +40,40 @@ class EvaluationDAO @Inject()(val userDAO: UserDAO, protected val dbConfigProvid
     db.run(sql)
   }
 
+  def questionResponseJSON(evaluationId: Long, userId: Long): Future[Option[String]] = {
+    val sql =
+      sql"""
+           |select json_agg(t)
+           |from (select
+           |        "Question".id      as question_id,
+           |        "Question".content as question,
+           |        R.id               as response_id,
+           |        R.answer,
+           |        comments
+           |      from "Question"
+           |        join (
+           |               select
+           |                 "Response".*,
+           |                 array_remove(array_agg(C), NULL) as comments
+           |               from "Response"
+           |                 left join (
+           |                             select
+           |                               U."ID"         as user_id,
+           |                               U."USERNAME"   as username,
+           |                               "Comment"."ID" as comment_Id,
+           |                               "Comment".comment,
+           |                               "Comment".response_id
+           |                             from "Comment"
+           |                               join "USER" U on "Comment".user_id = U."ID") C on "Response".id = C.response_id
+           |               where creator = $userId
+           |               group by "Response".id) R on "Question".id = R.question
+           |      where "evaluationId" = $evaluationId
+           |      order by question_id) t
+         """.stripMargin.as[String].headOption
+    db.run(sql)
+  }
+
+
   class EvaluationsTable(tag: Tag) extends Table[Evaluation](tag, "Evaluation") {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
 
