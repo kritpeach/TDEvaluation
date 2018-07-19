@@ -1,147 +1,173 @@
 @(questionListJSON: String, evaluation: Evaluation)(implicit session: play.api.mvc.Session, request: play.api.mvc.RequestHeader)
-@managementMain("Evaluation detail") {
-    <div id="app">
-        <div class="row">
-            <div class="col-lg-12 grid-margin stretch-card">
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title float-left">@evaluation.title</h4>
-                        <div class="float-right">
-                            <button v-on:click="showCreateModal" class="btn btn-success btn-block">
-                                New question
-                                <i class="mdi mdi-plus"></i>
-                            </button>
+    @managementMain("Evaluation detail") {
+        <div id="app">
+            <div class="row">
+                <div class="col-lg-12 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="row m-0">
+                                        <h4 class="card-title float-left">@evaluation.title</h4>
+                                    </div>
+                                    <div class="row m-0">
+                                        <div class="form-check mb-0">
+                                            <label class="form-check-label">
+                                                <input type="checkbox" class="form-check-input" checked=""> Enable
+                                                <i class="input-helper"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="float-right">
+                                        <button v-on:click="showCreateModal" class="btn btn-success btn-block">
+                                            New question
+                                            <i class="mdi mdi-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Question</th>
-                                        <th>Type</th>
-                                        <th class="text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="q in questionList">
-                                        <td>{{q.content}}</td>
-                                        <td>{{q.questionType}}</td>
-                                        <td class="text-right">
-                                            <button v-on:click="showEditModal(q)" type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
-                                                <i class="mdi mdi-pencil"></i>
-                                            </button>
-                                            <button v-on:click="remove(q.id, q.content)" type="button" class="btn btn-icons btn-sm btn-inverse-outline-danger">
-                                                <i class="mdi mdi-delete"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    </div>
+                </div>
+                <div class="col-lg-12 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Question</th>
+                                            <th>Type</th>
+                                            <th class="text-right">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="q in questionList">
+                                            <td>{{q.content}}</td>
+                                            <td>{{q.questionType}}</td>
+                                            <td class="text-right">
+                                                <button v-on:click="showEditModal(q)" type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
+                                                    <i class="mdi mdi-pencil"></i>
+                                                </button>
+                                                <button v-on:click="remove(q.id, q.content)" type="button" class="btn btn-icons btn-sm btn-inverse-outline-danger">
+                                                    <i class="mdi mdi-delete"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal" id="myModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 v-if="isEditMode" class="modal-title">Edit Question</h4>
+                            <h4 v-else class="modal-title">New Question</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="questionInput">Question</label>
+                                <input v-model="form.content" class="form-control" id="questionInput" placeholder="Enter question">
+                            </div>
+                            <div class="form-group">
+                                <label for="questionTypeInput">Type</label>
+                                <select v-model="form.questionType" class="form-control" id="questionTypeInput">
+                                    <option value="SCORE">Score</option>
+                                    <option value="TEXT">Text</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button v-on:click="submit" :disabled="submitting" class="btn btn-success mr-2">
+                                <i v-if="submitting" class="mdi mdi-refresh mdi-spin"></i>Submit</button>
+                            <button class="btn btn-light" data-dismiss="modal">Cancel</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="modal" id="myModal">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 v-if="isEditMode" class="modal-title">Edit Question</h4>
-                        <h4 v-else class="modal-title">New Question</h4>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="questionInput">Question</label>
-                            <input v-model="form.content" class="form-control" id="questionInput" placeholder="Enter question">
-                        </div>
-                        <div class="form-group">
-                            <label for="questionTypeInput">Type</label>
-                            <select v-model="form.questionType" class="form-control" id="questionTypeInput">
-                                <option value="SCORE">Score</option>
-                                <option value="TEXT">Text</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button v-on:click="submit" :disabled="submitting" class="btn btn-success mr-2">
-                            <i v-if="submitting" class="mdi mdi-refresh mdi-spin"></i>Submit</button>
-                        <button class="btn btn-light" data-dismiss="modal">Cancel</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-            const emptyForm = {
-                id: null,
-                content: "",
-                questionType: "SCORE",
-                evaluationId: @evaluation.id
-            };
-            new Vue({
-                el: '#app',
-                data: {
-                    questionList: @Html(questionListJSON),
-                    form: {...emptyForm},
-                    submitting: false,
-                    isEditMode: false
-                },
-                computed: {
-                    questionListSortByName() {
-                        return this.questionList.sort((a, b) => {
-                            if (a.content < b.content)
-                                return -1;
-                            if (a.content > b.content)
-                                return 1;
-                            return 0;
-                        });
-                    }
-                },
-                methods: {
-                    async remove(id, content) {
-                        if (confirm(`Are you sure you want to delete ${content}?`)) {
-                            await fetch(`/management/question/${id}?csrfToken=@helper.CSRF.getToken.value`, {
-                                method: 'delete',
-                                credentials: 'same-origin'
+        <script>
+                const emptyForm = {
+                    id: null,
+                    content: "",
+                    questionType: "SCORE",
+                    evaluationId: @evaluation.id
+                };
+                new Vue({
+                    el: '#app',
+                    data: {
+                        questionList: @Html(questionListJSON),
+                        form: {...emptyForm},
+                        submitting: false,
+                        isEditMode: false
+                    },
+                    computed: {
+                        questionListSortByName() {
+                            return this.questionList.sort((a, b) => {
+                                if (a.content < b.content)
+                                    return -1;
+                                if (a.content > b.content)
+                                    return 1;
+                                return 0;
                             });
-                            this.questionList = this.questionList.filter(question => question.id !== id);
                         }
                     },
-                    async submit() {
-                        this.submitting = true
-                        const response = await fetch("@helper.CSRF(routes.QuestionController.upsertQuestion())", {
-                            method: "POST",
-                            credentials: 'same-origin',
-                            body: JSON.stringify(this.form),
-                            headers: {
-                                'Content-Type': 'application/json'
+                    methods: {
+                        async remove(id, content) {
+                            if (confirm(`Are you sure you want to delete ${content}?`)) {
+                                await fetch(`/management/question/${id}?csrfToken=@helper.CSRF.getToken.value`, {
+                                    method: 'delete',
+                                    credentials: 'same-origin'
+                                });
+                                this.questionList = this.questionList.filter(question => question.id !== id);
                             }
-                        });
-                        const result = await response.json();
-                        if (!this.isEditMode && result.success) {
-                            this.questionList = [...this.questionList, result.question];
+                        },
+                        async submit() {
+                            this.submitting = true
+                            const response = await fetch("@helper.CSRF(routes.QuestionController.upsertQuestion())", {
+                                method: "POST",
+                                credentials: 'same-origin',
+                                body: JSON.stringify(this.form),
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+                            const result = await response.json();
+                            if (!this.isEditMode && result.success) {
+                                this.questionList = [...this.questionList, result.question];
+                                this.form = {...emptyForm};
+                                $("#myModal").modal('hide');
+                                alert(`Created ${result.question.content}`);
+                            } else if (this.isEditMode && result.success) {
+                                this.questionList = this.questionList.map(question => question.id === result.question.id ? result.question : question);
+                                $("#myModal").modal('hide');
+                                alert(`Updated ${result.question.content}`);
+                            } else if (result.uniqueViolation) {
+                                alert(`${this.form.content} is already exist`);
+                            }
+                            this.submitting = false
+                        },
+                        showEditModal(question) {
+                            this.isEditMode = true;
+                            this.form = {...question};
+                            $("#myModal").modal('show');
+                        },
+                        showCreateModal() {
+                            this.isEditMode = false;
                             this.form = {...emptyForm};
-                            $("#myModal").modal('hide');
-                            alert(`Created ${result.question.content}`);
-                        } else if (this.isEditMode && result.success) {
-                            this.questionList = this.questionList.map(question => question.id === result.question.id ? result.question : question);
-                            $("#myModal").modal('hide');
-                            alert(`Updated ${result.question.content}`);
-                        } else if (result.uniqueViolation) {
-                            alert(`${this.form.content} is already exist`);
+                            $("#myModal").modal('show')
                         }
-                        this.submitting = false
-                    },
-                    showEditModal(question) {
-                        this.isEditMode = true;
-                        this.form = {...question};
-                        $("#myModal").modal('show');
-                    },
-                    showCreateModal() {
-                        this.isEditMode = false;
-                        this.form = {...emptyForm};
-                        $("#myModal").modal('show')
                     }
+                })
+        </script>
+        <style>
+                h4 {
+                    margin-bottom: 0 !important;
                 }
-            })
-    </script>
-}
+        </style>
+    }
