@@ -26,12 +26,6 @@ class ResponseController @Inject()(
       "answer" -> nonEmptyText
     )
   )
-  //  def managementResponseList(): Action[AnyContent] = Action.async { implicit request =>
-  //    responseDAO.list().map(responses => {
-  //      val responseListJSON = Json.toJson(responses).toString()
-  //      Ok(views.html.managementResponseList(responseListJSON))
-  //    })
-  //  }
 
   def deleteResponse(id: Long): Action[AnyContent] = Action.async { implicit request =>
     responseDAO.delete(id).map(x => Ok(Json.toJson(x)))
@@ -49,13 +43,10 @@ class ResponseController @Inject()(
     })
   }
 
-  def complete() = Action { implicit request =>
-    Ok(views.html.complete())
-  }
+  def complete() = Action { implicit request => Ok(views.html.complete()) }
 
-  def createTable() = Action {
-    Await.result(responseDAO.createTable, Duration.Inf)
-    Ok("Create Table")
+  def createTable(): Action[AnyContent] = Action.async {
+    responseDAO.createTable.map(_ => Ok("Created Table"))
   }
 
   def responseList(): Action[AnyContent] = Action.async { implicit request =>

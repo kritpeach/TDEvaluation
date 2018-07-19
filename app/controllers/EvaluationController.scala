@@ -47,9 +47,8 @@ class EvaluationController @Inject()(
     }
   }
 
-  def createTable() = Action {
-    Await.result(evaluationDAO.createTable, Duration.Inf)
-    Ok("Create Table")
+  def createTable(): Action[AnyContent] = Action.async {
+    evaluationDAO.createTable.map(_ => Ok("Create Table"))
   }
 
   def evaluationList(): Action[AnyContent] = Action.async { implicit request =>
@@ -76,6 +75,6 @@ class EvaluationController @Inject()(
   def managementEvaluationResponse(evaluationId: Long, userId: Long): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     val evaluation = Await.result(evaluationDAO.getById(evaluationId), Duration.Inf).get
     val user = Await.result(userDAO.getById(userId), Duration.Inf).get
-    evaluationDAO.questionResponseJSON(evaluationId, userId).map(questionResponseJSON => Ok(views.html.managementEvaluationResponse(user,evaluation,questionResponseJSON.get)))
+    evaluationDAO.questionResponseJSON(evaluationId, userId).map(questionResponseJSON => Ok(views.html.managementEvaluationResponse(user, evaluation, questionResponseJSON.get)))
   }
 }

@@ -7,7 +7,7 @@ import org.postgresql.util.PSQLException
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.I18nSupport
-import play.api.libs.json.{JsError, JsSuccess, Json, Writes}
+import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc._
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -76,9 +76,8 @@ class UserController @Inject()(
     }
   }
 
-  def createTable() = Action {
-    Await.result(userDAO.createTable, Duration.Inf)
-    Ok("Create Table")
+  def createTable(): Action[AnyContent] = Action.async {
+    userDAO.createTable.map(_ => Ok("Created Table"))
   }
 
   def userList(): Action[AnyContent] = Action.async { implicit request =>

@@ -7,8 +7,7 @@ import org.postgresql.util.PSQLException
 import play.api.i18n.I18nSupport
 import play.api.libs.json._
 import play.api.mvc._
-
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success, Try}
 
@@ -20,14 +19,10 @@ class QuestionController @Inject()(
                                     cc: ControllerComponents)
                                   (implicit executionContext: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
-  def managementQuestionList(evaluationId: Long): Action[AnyContent] = Action.async { implicit request =>
-    questionDAO.list(evaluationId).map(questions => {
-      val questionListJSON = Json.toJson(questions).toString()
-      Await.result(evaluationDAO.getById(evaluationId), Duration.Inf) match {
-        case Some(evaluation) => Ok(views.html.managementQuestionList(questionListJSON, evaluation))
-        case None => ???
-      }
-    })
+  def managementQuestionList(evaluationId: Long): Action[AnyContent] = Action { implicit request =>
+    val questionListJSON = Await.result(questionDAO.list(evaluationId).map(questions => Json.toJson(questions).toString),Duration.Inf)
+    val evaluation = Await.result(evaluationDAO.getById(evaluationId),Duration.Inf).get
+    Ok(views.html.managementQuestionList(questionListJSON, evaluation))
   }
 
   def deleteQuestion(id: Long): Action[AnyContent] = Action.async { implicit request =>
@@ -48,9 +43,8 @@ class QuestionController @Inject()(
     }
   }
 
-  def createTable() = Action {
-    Await.result(questionDAO.createTable, Duration.Inf)
-    Ok("Create Table")
+  def createTable(): Action[AnyContent] = Action.async {
+    questionDAO.createTable.map(_ => Ok("Created Table"))
   }
 
   def questionList(): Action[AnyContent] = Action.async { implicit request =>
@@ -59,7 +53,7 @@ class QuestionController @Inject()(
 
   def askQuestion(id: Long): Action[AnyContent] = Action.async { implicit request =>
     val uid: Long = request.session.get("uid").get.toLong
-    val existingResponse: Option[Response] = Await.result(responseDAO.get(uid,id),Duration.Inf)
-    questionDAO.getById(id).map(question => Ok(views.html.askQuestion(question.get,existingResponse)))
+    val existingResponse: Option[Response] = Await.result(responseDAO.get(uid, id), Duration.Inf)
+    questionDAO.getById(id).map(question => Ok(views.html.askQuestion(question.get, existingResponse)))
   }
 }

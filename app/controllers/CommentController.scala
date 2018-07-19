@@ -17,14 +17,7 @@ class CommentController @Inject()(
                                    commentDAO: CommentDAO,
                                    cc: ControllerComponents)
                                  (implicit executionContext: ExecutionContext) extends AbstractController(cc) with I18nSupport {
-  /*
-    def managementCommentList(): Action[AnyContent] = Action.async { implicit request =>
-      commentDAO.list().map(comments => {
-        val commentListJSON = Json.toJson(comments).toString()
-        Ok(views.html.managementCommentList(commentListJSON))
-      })
-    }
-  */
+
   def deleteComment(id: Long): Action[AnyContent] = Action.async { implicit request =>
     commentDAO.delete(id).map(x => Ok(Json.toJson(x)))
   }
@@ -35,7 +28,7 @@ class CommentController @Inject()(
     comment.validate[Comment] match {
       case JsSuccess(comment: Comment, _) =>
         Try(Await.result(commentDAO.upsert(comment), Duration.Inf)) match {
-          case Success(u) => Ok(Json.obj("success" -> true, "comment" -> u))
+          case Success(s) => Ok(Json.obj("success" -> true, "comment" -> s))
           case Failure(e: PSQLException) => e.getSQLState match {
             case "23505" => Ok(Json.obj("success" -> false, "uniqueViolation" -> true))
             case _ => Ok(Json.obj("success" -> false))
@@ -45,9 +38,8 @@ class CommentController @Inject()(
     }
   }
 
-  def createTable() = Action {
-    Await.result(commentDAO.createTable, Duration.Inf)
-    Ok("Create Table")
+  def createTable(): Action[AnyContent] = Action.async {
+    commentDAO.createTable.map(_ => Ok("Create Table"))
   }
 
   def commentList(): Action[AnyContent] = Action.async { implicit request =>
