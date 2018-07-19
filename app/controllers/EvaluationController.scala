@@ -2,16 +2,15 @@ package controllers
 
 import dao.{EvaluationDAO, QuestionDAO, UserDAO}
 import javax.inject._
-import models.Evaluation
+import models.{Evaluation, User}
 import org.postgresql.util.PSQLException
 import play.api.i18n.I18nSupport
 import play.api.libs.json._
 import play.api.mvc._
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success, Try}
-import scala.concurrent.ExecutionContext
 
 @Singleton
 class EvaluationController @Inject()(
@@ -68,13 +67,15 @@ class EvaluationController @Inject()(
     evaluationDAO.userResponseCount(id).map(responseCount => Ok(views.html.managementEvaluationView(evaluation, responseCount)))
   }
 
-  def report(): Action[AnyContent] = Action.async {
-    evaluationDAO.questionResponseJSON(1, 56).map(s => Ok(s.get))
-  }
-
   def managementEvaluationResponse(evaluationId: Long, userId: Long): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
-    val evaluation = Await.result(evaluationDAO.getById(evaluationId), Duration.Inf).get
-    val user = Await.result(userDAO.getById(userId), Duration.Inf).get
-    evaluationDAO.questionResponseJSON(evaluationId, userId).map(questionResponseJSON => Ok(views.html.managementEvaluationResponse(user, evaluation, questionResponseJSON.get)))
+    val results: Future[(Option[Evaluation], Option[User], Option[String])] = for {
+      evaluationResult <- evaluationDAO.getById(evaluationId)
+      userResult <- userDAO.getById(userId)
+      questionResponseJSONResult <- evaluationDAO.questionResponseJSON(evaluationId, userId)
+    } yield (evaluationResult, userResult, questionResponseJSONResult)
+    results.map(result => {
+      val (evaluation, user, questionResponseJSON) = result
+      Ok(views.html.managementEvaluationResponse(user.get, evaluation.get, if (questionResponseJSON.get.eq(null)) "[]" else questionResponseJSON.get))
+    })
   }
 }
