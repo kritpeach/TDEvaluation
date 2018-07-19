@@ -51,7 +51,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button v-on:click="submit" :disabled="submitting" type="submit" class="btn btn-success mr-2">Submit</button>
+                        <button v-on:click="submit" :disabled="submitting" type="submit" class="btn btn-success mr-2">
+                            <i v-if="submitting" class="mdi mdi-refresh mdi-spin"></i>Submit</button>
                         <button class="btn btn-light" data-dismiss="modal">Cancel</button>
                     </div>
                 </div>
@@ -82,11 +83,18 @@
                         }
                     },
                     async submit() {
+                        const getQuestionResponse = (responseId) => [].concat(...this.questionResponseList.map(r => r.comments))
+                                .find(r => r.user_id === @session.get("uid") && r.response_id === responseId);
+
                         this.submitting = true;
+                        const userQuestionResponse = getQuestionResponse(this.form.responseId)
                         const response = await fetch("@helper.CSRF(routes.CommentController.upsertComment)", {
                             method: "POST",
                             credentials: 'same-origin',
-                            body: JSON.stringify(this.form),
+                            body: JSON.stringify({
+                                ...this.form,
+                                id: userQuestionResponse ? userQuestionResponse.comment_id : null
+                            }),
                             headers: {
                                 'Content-Type': 'application/json'
                             }
@@ -95,9 +103,25 @@
                         if (result.success) {
                             this.form = {...emptyForm};
                             $("#myModal").modal('hide');
-                            alert(`Created`);
-                        } else if (result.uniqueViolation) {
-                            alert(`Already exist`);
+                            const commentResult = result.comment;
+                            const formattedCommentResult = {
+                                user_id: commentResult.userId,
+                                username: "@session.get("username")",
+                                comment_id: commentResult.id,
+                                comment: commentResult.comment,
+                                response_id: commentResult.responseId
+                            };
+                            this.questionResponseList = this.questionResponseList.reduce((state, questionResponse) => {
+                                // Already comment so, update the existed
+                                if (questionResponse.response_id === formattedCommentResult.response_id) {
+                                    const newComments = questionResponse.comments.map(comment => comment.comment_id === formattedCommentResult.comment_id ? formattedCommentResult : comment);
+                                    const newQuestionResponse = {...questionResponse, comments: newComments};
+                                    return [...state, newQuestionResponse]
+                                }
+                                else
+                                    return [...state, questionResponse]
+                            }, []);
+                            alert(`Done`);
                         }
                         this.submitting = false
                     },
