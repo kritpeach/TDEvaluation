@@ -41,6 +41,10 @@ class EvaluationDAO @Inject()(val userDAO: UserDAO, protected val dbConfigProvid
 
   def createTable: Future[Unit] = db.run(Evaluations.schema.create)
 
+  def updateTitle(id: Long, title: String): Future[Int] = db.run(Evaluations.filter(_.id === id).map(_.title).update(title))
+
+  def updateEnabled(id: Long, enabled: Boolean): Future[Int] = db.run(Evaluations.filter(_.id === id).map(_.enabled).update(enabled))
+
   def userResponseCount(evaluationId: Long): Future[Vector[UserResponseCount]] = {
     implicit val getUserResponseCount: AnyRef with GetResult[UserResponseCount] = GetResult[UserResponseCount](r => UserResponseCount(r.nextLong, r.nextString, r.nextInt, r.nextInt))
     val sql = sql"""select u."ID", u."USERNAME", coalesce(response_count,0) as response_count,(select count(*) from "Question" where "evaluationId" = $evaluationId) as answer_count from ( select creator, count(q) as response_count from "Response" join "Question" q on "Response".question = q.id where q."evaluationId" = $evaluationId group by creator) a right join "USER" u on u."ID" = a.creator where u."IS_MANAGER" is false;""".as[UserResponseCount]

@@ -13,6 +13,8 @@ GET           /gentable/response                                           contr
 GET           /gentable/comment                                            controllers.CommentController.createTable
 DELETE        /management/user/:id                                         controllers.UserController.deleteUser(id: Long)
 GET           /management/evaluation                                       controllers.EvaluationController.managementEvaluationList
+PUT           /management/evaluation/:id/title/:title                      controllers.EvaluationController.updateTitle(id: Long,title: String)
+PUT           /management/evaluation/:id/enabled/:enabled                  controllers.EvaluationController.updateEnabled(id: Long,enabled: Boolean)
 GET           /management/evaluation/:id                                   controllers.EvaluationController.managementEvaluationView(id: Long)
 POST          /management/evaluation                                       controllers.EvaluationController.upsertEvaluation
 GET           /management/evaluation/:id/edit                              controllers.QuestionController.managementQuestionList(id: Long)

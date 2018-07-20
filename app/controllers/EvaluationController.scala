@@ -62,6 +62,20 @@ class EvaluationController @Inject()(
     questionDAO.getFirst(id).map(question => Redirect(routes.QuestionController.askQuestion(question.get.id.get)))
   }
 
+  def updateTitle(id: Long, title: String): Action[AnyContent] = Action.async { implicit  request =>
+    evaluationDAO.updateTitle(id,title).map({
+      case 0 => Ok(Json.obj("success" -> false))
+      case 1 => Ok(Json.obj("success" -> true))
+    })
+  }
+
+  def updateEnabled(id: Long, enabled: Boolean): Action[AnyContent] = Action.async { implicit  request =>
+    evaluationDAO.updateEnabled(id,enabled).map({
+      case 0 => Ok(Json.obj("success" -> false))
+      case 1 => Ok(Json.obj("success" -> true))
+    })
+  }
+
   def managementEvaluationView(id: Long): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     val evaluation = Await.result(evaluationDAO.getById(id), Duration.Inf).get
     evaluationDAO.userResponseCount(id).map(responseCount => Ok(views.html.managementEvaluationView(evaluation, responseCount)))
