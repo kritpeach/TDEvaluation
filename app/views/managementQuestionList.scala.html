@@ -7,8 +7,11 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-lg-6">
-                                <div class="row m-0">
-                                    <h4 class="card-title float-left">{{title}}</h4>
+                                <div class="row m-0" style="align-items: center">
+                                    <button v-on:click="editTitle" id="editTitleBtn" type="button" class="btn btn-xs btn-icons btn-rounded btn-outline-secondary">
+                                        <i class="mdi mdi-pencil"></i>
+                                    </button>
+                                    <h4 style="padding-left: 10px" class="card-title float-left">{{title}}</h4>
                                 </div>
                                 <div class="row m-0">
                                     <div class="form-check mb-0">
@@ -121,6 +124,17 @@
                     }
                 },
                 methods: {
+                    async editTitle() {
+                        const title = prompt("Change title", this.title);
+                        if (title) {
+                            const response = await fetch(`/management/evaluation/@evaluation.id/title/${title}?csrfToken=@helper.CSRF.getToken.value`, {
+                                method: 'put',
+                                credentials: 'same-origin'
+                            });
+                            const responseJson = await response.json();
+                            if (responseJson.success) this.title = title;
+                        }
+                    },
                     async enabledCheckBoxClick() {
                         await fetch(`/management/evaluation/@evaluation.id/enabled/${this.enabled}?csrfToken=@helper.CSRF.getToken.value`, {
                             method: 'put',
@@ -177,6 +191,12 @@
     <style>
             h4 {
                 margin-bottom: 0 !important;
+            }
+
+            #editTitleBtn {
+                width: 20px;
+                padding: 0;
+                height: 20px;
             }
     </style>
 }
