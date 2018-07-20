@@ -17,7 +17,7 @@ class EvaluationDAO @Inject()(val userDAO: UserDAO, protected val dbConfigProvid
 
   def getById(id: Long): Future[Option[Evaluation]] = db.run(Evaluations.filter(_.id === id).result.headOption)
 
-  def list(): Future[Seq[Evaluation]] = db.run(Evaluations.sortBy(_.id).result)
+  def list(): Future[Seq[Evaluation]] = db.run(Evaluations.sortBy(_.id.desc).result)
 
   def list(enabled: Boolean): Future[Seq[Evaluation]] = db.run(Evaluations.filter(_.enabled === enabled).sortBy(_.id).result)
 

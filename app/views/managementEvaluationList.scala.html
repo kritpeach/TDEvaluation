@@ -18,6 +18,7 @@
                                         <tr>
                                             <th>Topic</th>
                                             <th>Created date</th>
+                                            <th>Enabled</th>
                                             <th class="text-right">Action</th>
                                         </tr>
                                     </thead>
@@ -25,6 +26,10 @@
                                         <tr v-for="evaluation in evaluationList">
                                             <td v-on:click="goToEvaluationViewPage(evaluation.id)">{{evaluation.title}}</td>
                                             <td v-on:click="goToEvaluationViewPage(evaluation.id)">{{getReadAbleDate(evaluation.createAt)}}</td>
+                                            <td>
+                                                <label v-if="evaluation.enabled" class="badge badge-success">Enable</label>
+                                                <label v-else class="badge badge-danger">Disable</label>
+                                            </td>
                                             <td class="text-right">
                                                 <button v-on:click="goToEvaluationEditPage(evaluation.id)" type="button" class="btn btn-icons btn-sm btn-inverse-outline-warning">
                                                     <i class="mdi mdi-pencil"></i>
