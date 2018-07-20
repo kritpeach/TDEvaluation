@@ -1,5 +1,5 @@
 @(questionListJSON: String, evaluation: Evaluation)(implicit session: play.api.mvc.Session, request: play.api.mvc.RequestHeader)
-@managementMain("Evaluation detail") {
+@managementMain(s"${evaluation.title} - Evaluation management") {
     <div id="app">
         <div class="row">
             <div class="col-lg-12 grid-margin stretch-card">
