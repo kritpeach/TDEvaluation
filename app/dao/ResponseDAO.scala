@@ -24,11 +24,6 @@ class ResponseDAO @Inject()(val userDAO: UserDAO, val questionDAO: QuestionDAO, 
     .filter(_.questionId === questionId)
     .result.headOption
   )
-
-  def insert(response: Response): Future[Response] = db
-    .run(Responses returning Responses.map(_.id) += response)
-    .map(id => response.copy(id = Some(id)))
-
   def delete(id: Long): Future[Int] = db.run(Responses.filter(_.id === id).delete)
 
   def upsert(response: Response): Future[Response] = db.run((Responses returning Responses).insertOrUpdate(response)).map {

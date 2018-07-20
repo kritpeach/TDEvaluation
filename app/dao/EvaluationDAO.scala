@@ -21,9 +21,16 @@ class EvaluationDAO @Inject()(val userDAO: UserDAO, protected val dbConfigProvid
 
   def list(enabled: Boolean): Future[Seq[Evaluation]] = db.run(Evaluations.filter(_.enabled === enabled).sortBy(_.id).result)
 
-  def insert(evaluation: Evaluation): Future[Evaluation] = db
-    .run(Evaluations returning Evaluations.map(_.id) += evaluation)
-    .map(id => evaluation.copy(id = Some(id)))
+  def listOnlyDefinedQuestion(enabled: Boolean): Future[Seq[Evaluation]] = {
+    /*
+    val implicitInnerJoin = for {
+      e <- Evaluations
+      q <- questionDAO.getQuestions if e.id === q.evaluationId
+    } yield e
+    db.run(implicitInnerJoin.distinctOn(_.id).filter(_.enabled === enabled).result)
+    */
+    ???
+  }
 
   def delete(id: Long): Future[Int] = db.run(Evaluations.filter(_.id === id).delete)
 

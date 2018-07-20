@@ -15,10 +15,6 @@ class CommentDAO @Inject()(val userDAO: UserDAO, val responseDAO: ResponseDAO, p
 
   def list(): Future[Seq[Comment]] = db.run(Comments.sortBy(_.id).result)
 
-  def insert(comment: Comment): Future[Comment] = db
-    .run(Comments returning Comments.map(_.id) += comment)
-    .map(id => comment.copy(id = Some(id)))
-
   def delete(id: Long): Future[Int] = db.run(Comments.filter(_.id === id).delete)
 
   def upsert(comment: Comment): Future[Comment] = db.run((Comments returning Comments).insertOrUpdate(comment)).map {

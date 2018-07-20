@@ -14,6 +14,8 @@ class QuestionDAO @Inject()(val evaluationDAO: EvaluationDAO, protected val dbCo
   import profile.api._
 
   val Questions = TableQuery[QuestionsTable]
+
+  def getQuestions = TableQuery[QuestionsTable]
   def list(): Future[Seq[Question]] = db.run(Questions.sortBy(_.id).result)
   def list(evaluationId: Long): Future[Seq[Question]] = db.run(Questions.filter(_.evaluationId === evaluationId).result)
   def getById(id: Long): Future[Option[Question]] = db.run(Questions.filter(_.id === id).result.headOption)
@@ -26,9 +28,6 @@ class QuestionDAO @Inject()(val evaluationDAO: EvaluationDAO, protected val dbCo
       .result
       .headOption
   )
-  def insert(question: Question): Future[Question] = db
-    .run(Questions returning Questions.map(_.id) += question)
-    .map(id => question.copy(id = Some(id)))
 
   def delete(id: Long): Future[Int] = db.run(Questions.filter(_.id === id).delete)
 

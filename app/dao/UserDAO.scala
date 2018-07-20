@@ -15,9 +15,6 @@ class UserDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
   def list(): Future[Seq[User]] = db.run(Users.sortBy(_.username).result)
 
   def getById(id: Long): Future[Option[User]] = db.run(Users.filter(_.id === id).result.headOption)
-  def insert(user: User): Future[User] = db
-    .run(Users returning Users.map(_.id) += user)
-    .map(id => user.copy(id = Some(id)))
 
   def delete(id: Long): Future[Int] = db.run(Users.filter(_.id === id).delete)
 
