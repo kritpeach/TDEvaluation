@@ -29,7 +29,7 @@ class UserController @Inject()(
 
   def authenticate: Action[AnyContent] = Action.async { implicit request =>
     val (username, password) = signInForm.bindFromRequest.get
-    userDAO.getUser(username, password).map {
+    userDAO.getUser(username.toLowerCase, password).map {
       case Some(user) => Redirect(
         if (user.isManager)
           routes.UserController.managementUserList()
@@ -65,7 +65,7 @@ class UserController @Inject()(
     val userResult = request.body.asJson.get.validate[User]
     userResult match {
       case JsSuccess(user: User, _) =>
-        Try(Await.result(userDAO.upsert(user), Duration.Inf)) match {
+        Try(Await.result(userDAO.upsert(user.copy(username = user.username.toLowerCase)), Duration.Inf)) match {
           case Success(u) => Ok(Json.obj("success" -> true, "user" -> u))
           case Failure(e: PSQLException) => e.getSQLState match {
             case "23505" => Ok(Json.obj("success" -> false, "uniqueViolation" -> true))
