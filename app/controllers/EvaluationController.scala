@@ -18,6 +18,7 @@ class EvaluationController @Inject()(
                                       questionDAO: QuestionDAO,
                                       userDAO: UserDAO,
                                       authenticatedManagerAction: AuthenticatedManagerAction,
+                                      authenticatedAssessorAction: AuthenticatedAssessorAction,
                                       cc: ControllerComponents)
                                     (implicit executionContext: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
@@ -55,7 +56,7 @@ class EvaluationController @Inject()(
     evaluationDAO.list(true).map(evaluationList => Ok(views.html.evaluation(evaluationList)))
   }
 
-  def evaluation(id: Long): Action[AnyContent] = Action.async { implicit request =>
+  def evaluation(id: Long): Action[AnyContent] = authenticatedAssessorAction.async { implicit request =>
     questionDAO.getFirst(id).map(question => Redirect(routes.QuestionController.askQuestion(question.get.id.get)))
   }
 

@@ -17,6 +17,7 @@ class ResponseController @Inject()(
                                     responseDAO: ResponseDAO,
                                     questionDAO: QuestionDAO,
                                     authenticatedManagerAction: AuthenticatedManagerAction,
+                                    authenticatedAssessorAction: AuthenticatedAssessorAction,
                                     cc: ControllerComponents)
                                   (implicit executionContext: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
@@ -28,7 +29,7 @@ class ResponseController @Inject()(
     )
   )
 
-  def upsertResponse(): Action[AnyContent] = Action.async { implicit request =>
+  def upsertResponse(): Action[AnyContent] = authenticatedAssessorAction.async { implicit request =>
     val (responseId: Option[Long], questionId: Long, answer: String) = responseForm.bindFromRequest.get
     val creatorId: Long = request.session.get("uid").get.toLong
     val response: Response = Response(id = responseId, answer = answer, creatorId = creatorId, questionId = questionId)
@@ -40,7 +41,7 @@ class ResponseController @Inject()(
     })
   }
 
-  def complete() = Action { implicit request => Ok(views.html.complete()) }
+  def complete() = authenticatedAssessorAction { implicit request => Ok(views.html.complete()) }
 
   def createTable(): Action[AnyContent] = authenticatedManagerAction.async {
     responseDAO.createTable.map(_ => Ok("Created Table"))

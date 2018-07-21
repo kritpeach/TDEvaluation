@@ -17,6 +17,7 @@ class QuestionController @Inject()(
                                     evaluationDAO: EvaluationDAO,
                                     responseDAO: ResponseDAO,
                                     authenticatedManagerAction: AuthenticatedManagerAction,
+                                    authenticatedAssessorAction: AuthenticatedAssessorAction,
                                     cc: ControllerComponents)
                                   (implicit executionContext: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
@@ -48,7 +49,7 @@ class QuestionController @Inject()(
     questionDAO.createTable.map(_ => Ok("Created Table"))
   }
 
-  def askQuestion(id: Long): Action[AnyContent] = Action.async { implicit request =>
+  def askQuestion(id: Long): Action[AnyContent] = authenticatedAssessorAction.async { implicit request =>
     val uid: Long = request.session.get("uid").get.toLong
     val existingResponse: Option[Response] = Await.result(responseDAO.get(uid, id), Duration.Inf)
     questionDAO.getById(id).map(question => Ok(views.html.askQuestion(question.get, existingResponse)))
