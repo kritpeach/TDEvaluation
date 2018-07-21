@@ -10,6 +10,6 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     Ok(views.html.index())
   }
   def error404(path: String) = Action { implicit request: Request[AnyContent] =>
-    NotFound(views.html.error404())
+    NotFound(views.html.error("404","Not Found","The page you’re looking for was not found."))
   }
 }
