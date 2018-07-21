@@ -7,7 +7,7 @@
                         <div class="col-lg-7 mx-auto text-white">
                             <div class="row mt-5">
                                 <div class="col-12 text-center mt-xl-2">
-                                    <h3>Evaluation for @session.get("username")</h3>
+                                    <h3>Evaluation</h3>
                                 </div>
                             </div>
                             <div class="row mt-5">
@@ -20,7 +20,7 @@
                             <div class="row mt-5">
                                 <div class="col-12 text-center mt-xl-2">
                                     <a class="text-white font-weight-medium" href="@routes.UserController.signOut()">
-                                        Sign Out</a>
+                                        Sign Out - @session.get("username")</a>
                                 </div>
                             </div>
                         </div>
