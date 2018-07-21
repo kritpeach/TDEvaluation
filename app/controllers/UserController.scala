@@ -17,6 +17,7 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class UserController @Inject()(
                                 userDAO: UserDAO,
+                                authenticatedManagerAction: AuthenticatedManagerAction,
                                 cc: ControllerComponents)
                               (implicit executionContext: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
@@ -50,18 +51,18 @@ class UserController @Inject()(
       .withNewSession
   }
 
-  def managementUserList(): Action[AnyContent] = Action.async { implicit request =>
+  def managementUserList(): Action[AnyContent] = authenticatedManagerAction.async { implicit request =>
     userDAO.list().map(users => {
       val userListJSON = Json.toJson(users).toString()
       Ok(views.html.managementUserList(userListJSON))
     })
   }
 
-  def deleteUser(id: Long): Action[AnyContent] = Action.async { implicit request =>
+  def deleteUser(id: Long): Action[AnyContent] = authenticatedManagerAction.async { implicit request =>
     userDAO.delete(id).map(x => Ok(Json.toJson(x)))
   }
 
-  def upsertUser(): Action[AnyContent] = Action { implicit request =>
+  def upsertUser(): Action[AnyContent] = authenticatedManagerAction { implicit request =>
     val userResult = request.body.asJson.get.validate[User]
     userResult match {
       case JsSuccess(user: User, _) =>
@@ -76,11 +77,11 @@ class UserController @Inject()(
     }
   }
 
-  def createTable(): Action[AnyContent] = Action.async {
+  def createTable(): Action[AnyContent] = authenticatedManagerAction.async {
     userDAO.createTable.map(_ => Ok("Created Table"))
   }
 
-  def userList(): Action[AnyContent] = Action.async { implicit request =>
+  def userList(): Action[AnyContent] = authenticatedManagerAction.async { implicit request =>
     userDAO.list().map(user => Ok(Json.toJson(user)))
   }
 }

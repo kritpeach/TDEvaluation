@@ -17,21 +17,22 @@ class EvaluationController @Inject()(
                                       evaluationDAO: EvaluationDAO,
                                       questionDAO: QuestionDAO,
                                       userDAO: UserDAO,
+                                      authenticatedManagerAction: AuthenticatedManagerAction,
                                       cc: ControllerComponents)
                                     (implicit executionContext: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
-  def managementEvaluationList(): Action[AnyContent] = Action.async { implicit request =>
+  def managementEvaluationList(): Action[AnyContent] = authenticatedManagerAction.async { implicit request =>
     evaluationDAO.list().map(evaluations => {
       val evaluationListJSON = Json.toJson(evaluations).toString()
       Ok(views.html.managementEvaluationList(evaluationListJSON))
     })
   }
 
-  def deleteEvaluation(id: Long): Action[AnyContent] = Action.async { implicit request =>
+  def deleteEvaluation(id: Long): Action[AnyContent] = authenticatedManagerAction.async { implicit request =>
     evaluationDAO.delete(id).map(x => Ok(Json.toJson(x)))
   }
 
-  def upsertEvaluation(): Action[AnyContent] = Action { implicit request =>
+  def upsertEvaluation(): Action[AnyContent] = authenticatedManagerAction { implicit request =>
     val uid: Long = request.session.get("uid").get.toLong
     val evaluation = request.body.asJson.get.as[JsObject] + ("creator" -> JsNumber(uid))
     evaluation.validate[Evaluation] match {
@@ -46,12 +47,8 @@ class EvaluationController @Inject()(
     }
   }
 
-  def createTable(): Action[AnyContent] = Action.async {
+  def createTable(): Action[AnyContent] = authenticatedManagerAction.async {
     evaluationDAO.createTable.map(_ => Ok("Create Table"))
-  }
-
-  def evaluationList(): Action[AnyContent] = Action.async { implicit request =>
-    evaluationDAO.list().map(evaluation => Ok(Json.toJson(evaluation)))
   }
 
   def assessorEvaluation(): Action[AnyContent] = Action.async { implicit request =>
@@ -62,26 +59,26 @@ class EvaluationController @Inject()(
     questionDAO.getFirst(id).map(question => Redirect(routes.QuestionController.askQuestion(question.get.id.get)))
   }
 
-  def updateTitle(id: Long, title: String): Action[AnyContent] = Action.async { implicit  request =>
+  def updateTitle(id: Long, title: String): Action[AnyContent] = authenticatedManagerAction.async { implicit  request =>
     evaluationDAO.updateTitle(id,title).map({
       case 0 => Ok(Json.obj("success" -> false))
       case 1 => Ok(Json.obj("success" -> true))
     })
   }
 
-  def updateEnabled(id: Long, enabled: Boolean): Action[AnyContent] = Action.async { implicit  request =>
+  def updateEnabled(id: Long, enabled: Boolean): Action[AnyContent] = authenticatedManagerAction.async { implicit  request =>
     evaluationDAO.updateEnabled(id,enabled).map({
       case 0 => Ok(Json.obj("success" -> false))
       case 1 => Ok(Json.obj("success" -> true))
     })
   }
 
-  def managementEvaluationView(id: Long): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+  def managementEvaluationView(id: Long): Action[AnyContent] = authenticatedManagerAction.async { implicit request: Request[AnyContent] =>
     val evaluation = Await.result(evaluationDAO.getById(id), Duration.Inf).get
     evaluationDAO.userResponseCount(id).map(responseCount => Ok(views.html.managementEvaluationView(evaluation, responseCount)))
   }
 
-  def managementEvaluationResponse(evaluationId: Long, userId: Long): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+  def managementEvaluationResponse(evaluationId: Long, userId: Long): Action[AnyContent] = authenticatedManagerAction.async { implicit request: Request[AnyContent] =>
     val results: Future[(Option[Evaluation], Option[User], Option[String])] = for {
       evaluationResult <- evaluationDAO.getById(evaluationId)
       userResult <- userDAO.getById(userId)

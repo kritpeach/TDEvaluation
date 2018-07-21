@@ -16,20 +16,21 @@ class QuestionController @Inject()(
                                     questionDAO: QuestionDAO,
                                     evaluationDAO: EvaluationDAO,
                                     responseDAO: ResponseDAO,
+                                    authenticatedManagerAction: AuthenticatedManagerAction,
                                     cc: ControllerComponents)
                                   (implicit executionContext: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
-  def managementQuestionList(evaluationId: Long): Action[AnyContent] = Action { implicit request =>
+  def managementQuestionList(evaluationId: Long): Action[AnyContent] = authenticatedManagerAction { implicit request =>
     val questionListJSON = Await.result(questionDAO.list(evaluationId).map(questions => Json.toJson(questions).toString),Duration.Inf)
     val evaluation = Await.result(evaluationDAO.getById(evaluationId),Duration.Inf).get
     Ok(views.html.managementQuestionList(questionListJSON, evaluation))
   }
 
-  def deleteQuestion(id: Long): Action[AnyContent] = Action.async { implicit request =>
+  def deleteQuestion(id: Long): Action[AnyContent] = authenticatedManagerAction.async { implicit request =>
     questionDAO.delete(id).map(x => Ok(Json.toJson(x)))
   }
 
-  def upsertQuestion(): Action[AnyContent] = Action { implicit request =>
+  def upsertQuestion(): Action[AnyContent] = authenticatedManagerAction { implicit request =>
     val question = request.body.asJson.get.as[JsObject]
     question.validate[Question] match {
       case JsSuccess(question: Question, _) => Try(Await.result(questionDAO.upsert(question), Duration.Inf)) match {
@@ -43,12 +44,8 @@ class QuestionController @Inject()(
     }
   }
 
-  def createTable(): Action[AnyContent] = Action.async {
+  def createTable(): Action[AnyContent] = authenticatedManagerAction.async {
     questionDAO.createTable.map(_ => Ok("Created Table"))
-  }
-
-  def questionList(): Action[AnyContent] = Action.async { implicit request =>
-    questionDAO.list().map(question => Ok(Json.toJson(question)))
   }
 
   def askQuestion(id: Long): Action[AnyContent] = Action.async { implicit request =>

@@ -16,6 +16,7 @@ import scala.concurrent.duration.Duration
 class ResponseController @Inject()(
                                     responseDAO: ResponseDAO,
                                     questionDAO: QuestionDAO,
+                                    authenticatedManagerAction: AuthenticatedManagerAction,
                                     cc: ControllerComponents)
                                   (implicit executionContext: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
@@ -26,10 +27,6 @@ class ResponseController @Inject()(
       "answer" -> nonEmptyText
     )
   )
-
-  def deleteResponse(id: Long): Action[AnyContent] = Action.async { implicit request =>
-    responseDAO.delete(id).map(x => Ok(Json.toJson(x)))
-  }
 
   def upsertResponse(): Action[AnyContent] = Action.async { implicit request =>
     val (responseId: Option[Long], questionId: Long, answer: String) = responseForm.bindFromRequest.get
@@ -45,11 +42,7 @@ class ResponseController @Inject()(
 
   def complete() = Action { implicit request => Ok(views.html.complete()) }
 
-  def createTable(): Action[AnyContent] = Action.async {
+  def createTable(): Action[AnyContent] = authenticatedManagerAction.async {
     responseDAO.createTable.map(_ => Ok("Created Table"))
-  }
-
-  def responseList(): Action[AnyContent] = Action.async { implicit request =>
-    responseDAO.list().map(response => Ok(Json.toJson(response)))
   }
 }
