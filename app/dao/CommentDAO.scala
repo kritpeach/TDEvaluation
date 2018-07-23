@@ -13,6 +13,10 @@ class CommentDAO @Inject()(val userDAO: UserDAO, val responseDAO: ResponseDAO, p
 
   val Comments = TableQuery[CommentsTable]
 
+  def get(userId: Long, responseId: Long): Future[Option[Comment]] = db.run {
+    Comments.filter(_.userId === userId).filter(_.responseId === responseId).result.headOption
+  }
+
   def list(): Future[Seq[Comment]] = db.run(Comments.sortBy(_.id).result)
 
   def delete(id: Long): Future[Int] = db.run(Comments.filter(_.id === id).delete)

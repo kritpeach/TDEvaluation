@@ -1,13 +1,14 @@
 package controllers
 
-import dao.{EvaluationDAO, QuestionDAO, ResponseDAO}
+import dao.{CommentDAO, EvaluationDAO, QuestionDAO, ResponseDAO}
 import javax.inject._
-import models.{Question, Response}
+import models.{Comment, Question, Response}
 import org.postgresql.util.PSQLException
 import play.api.i18n.I18nSupport
 import play.api.libs.json._
 import play.api.mvc._
-import scala.concurrent.{Await, ExecutionContext}
+
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success, Try}
 
@@ -16,14 +17,15 @@ class QuestionController @Inject()(
                                     questionDAO: QuestionDAO,
                                     evaluationDAO: EvaluationDAO,
                                     responseDAO: ResponseDAO,
+                                    commentDAO: CommentDAO,
                                     authenticatedManagerAction: AuthenticatedManagerAction,
                                     authenticatedAssessorAction: AuthenticatedAssessorAction,
                                     cc: ControllerComponents)
                                   (implicit executionContext: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
   def managementQuestionList(evaluationId: Long): Action[AnyContent] = authenticatedManagerAction { implicit request =>
-    val questionListJSON = Await.result(questionDAO.list(evaluationId).map(questions => Json.toJson(questions).toString),Duration.Inf)
-    val evaluation = Await.result(evaluationDAO.getById(evaluationId),Duration.Inf).get
+    val questionListJSON = Await.result(questionDAO.list(evaluationId).map(questions => Json.toJson(questions).toString), Duration.Inf)
+    val evaluation = Await.result(evaluationDAO.getById(evaluationId), Duration.Inf).get
     Ok(views.html.managementQuestionList(questionListJSON, evaluation))
   }
 
@@ -49,9 +51,19 @@ class QuestionController @Inject()(
     questionDAO.createTable.map(_ => Ok("Created Table"))
   }
 
-  def askQuestion(id: Long): Action[AnyContent] = authenticatedAssessorAction.async { implicit request =>
+  def askQuestion(id: Long): Action[AnyContent] = authenticatedAssessorAction { implicit request =>
+    // TODO: Improve performance
     val uid: Long = request.session.get("uid").get.toLong
-    val existingResponse: Option[Response] = Await.result(responseDAO.get(uid, id), Duration.Inf)
-    questionDAO.getById(id).map(question => Ok(views.html.askQuestion(question.get, existingResponse)))
+    // questionDAO.getById(id).map(question => Ok(views.html.askQuestion(question.get, existedResponse)))
+    val futures: Future[(Option[Response], Option[Question])] = for {
+      response <- responseDAO.get(uid, id)
+      question <- questionDAO.getById(id)
+    } yield (response, question)
+    val (response: Option[Response], question) = Await.result(futures, Duration.Inf)
+    val comment: Option[Comment] = response match {
+      case Some(r) => Await.result(commentDAO.get(uid, r.id.get), Duration.Inf)
+      case None => None
+    }
+    Ok(views.html.askQuestion(question.get, response, comment))
   }
 }
