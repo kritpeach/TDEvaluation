@@ -19,15 +19,14 @@
                             </div>
                             <div class="row mt-5">
                                 <div class="col-12 text-center mt-xl-2">
-                                    <a class="text-white font-weight-medium" href="@routes.UserController.signOut()">
-                                        Sign Out - @session.get("username")</a>
+                                    @if(session.get("username").isDefined){
+                                        <a class="text-white font-weight-medium" href="@routes.UserController.signOut()">Sign Out - @session.get("username")</a>
+                                    }
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                    <!-- content-wrapper ends -->
             </div>
-                <!-- page-body-wrapper ends -->
         </div>
     }
