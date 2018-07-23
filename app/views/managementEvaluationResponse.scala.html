@@ -114,12 +114,14 @@
                             this.questionResponseList = this.questionResponseList.reduce((state, questionResponse) => {
                                 // Already comment so, update the existed
                                 if (questionResponse.response_id === formattedCommentResult.response_id) {
+                                    if (questionResponse.comments.length === 0)
+                                        return [...state, {...questionResponse, comments: [formattedCommentResult]}];
                                     const newComments = questionResponse.comments.map(comment => comment.comment_id === formattedCommentResult.comment_id ? formattedCommentResult : comment);
                                     const newQuestionResponse = {...questionResponse, comments: newComments};
-                                    return [...state, newQuestionResponse]
+                                    return [...state, newQuestionResponse];
                                 }
                                 else
-                                    return [...state, questionResponse]
+                                    return [...state, questionResponse];
                             }, []);
                             alert(`Done`);
                         }
