@@ -54,7 +54,6 @@ class QuestionController @Inject()(
   def askQuestion(id: Long): Action[AnyContent] = authenticatedAssessorAction { implicit request =>
     // TODO: Improve performance
     val uid: Long = request.session.get("uid").get.toLong
-    // questionDAO.getById(id).map(question => Ok(views.html.askQuestion(question.get, existedResponse)))
     val futures: Future[(Option[Response], Option[Question])] = for {
       response <- responseDAO.get(uid, id)
       question <- questionDAO.getById(id)

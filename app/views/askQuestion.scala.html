@@ -1,67 +1,84 @@
 @(question: Question, response: Option[Response], comment: Option[Comment])(implicit request: play.api.mvc.RequestHeader)
-    @main(question.content) {
-        <div class="container-scroller">
-            <div class="container-fluid page-body-wrapper full-page-wrapper auth-page">
-                <div class="content-wrapper d-flex align-items-center auth theme-one">
-                    <div class="row w-100">
-                        <div class="col-lg-4 mx-auto">
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width: 70%">
-                                    70%
-                                </div>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+@main(question.content) {
+    <div id="app" class="container-scroller">
+        <div class="container-fluid page-body-wrapper full-page-wrapper auth-page">
+            <div class="content-wrapper d-flex align-items-center auth theme-one">
+                <div class="row w-100">
+                    <div class="col-lg-4 mx-auto">
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width: 70%">
+                                70%
                             </div>
-                            <div class="auto-form-wrapper" style="box-shadow: 0px 0px 37.7px 11.3px rgba(0, 0, 0, 0.0">
-                                <h4 class="card-title">@question.content</h4>
-                                <form action="@helper.CSRF(routes.ResponseController.upsertResponse())" method="post">
-                                    <input type="hidden" name="questionId" value="@question.id">
-                                    @if(comment.isDefined) {
-                                        <input type="hidden" name="commentId" value="@comment.get.id.get">
-                                    }
-                                    @if(response.isDefined) {
-                                        <input type="hidden" name="responseId" value="@response.get.id.get">
-                                    }
-                                    @if(question.questionType.equals(QuestionType.Score)) {
-                                        <div class="form-group">
-                                        @for(score <- 1 to 5) {
-                                            <div class="form-radio">
-                                                <label class="form-check-label">
-                                                    @if(response.isDefined && response.get.answer == score.toString) {
-                                                        <input type="radio" value="@score" class="form-check-input" name="answer" checked>
-                                                    } else {
-                                                        <input type="radio" value="@score" class="form-check-input" name="answer">
-                                                    }
-                                                    @score
+                        </div>
+                        <div class="auto-form-wrapper" style="box-shadow: 0px 0px 37.7px 11.3px rgba(0, 0, 0, 0.0">
+                            <h4 class="card-title">@question.content</h4>
+                            <form action="@helper.CSRF(routes.ResponseController.upsertResponse())" method="post">
+                                <input type="hidden" name="questionId" value="@question.id">
+                                @if(comment.isDefined) {
+                                    <input type="hidden" name="commentId" value="@comment.get.id.get">
+                                }
+                                @if(response.isDefined) {
+                                    <input type="hidden" name="responseId" value="@response.get.id.get">
+                                }
+                                @if(question.questionType.equals(QuestionType.Score)) {
+                                    <div class="form-group">
+                                    @for(score <- 1 to 5) {
+                                        <div class="form-radio">
+                                            <label class="form-check-label">
+                                                <input type="radio" value="@score" class="form-check-input" v-model="answer" name="answer">
+                                                @score
                                                 <i class="input-helper"></i>
-                                                </label>
-                                            </div>
-                                        }
-                                        </div>
-                                    } else {
-                                        <div class="form-group">
-                                            <input type="text" value="@response.fold("")(_.answer)" name="answer" class="form-control" id="InputAns" placeholder="Answer">
+                                            </label>
                                         </div>
                                     }
-                                    <div class="form-group">
-                                        <label>Why?</label>
-                                        <input class="form-control" name="reason" placeholder="Reason">
                                     </div>
+                                } else {
                                     <div class="form-group">
-                                        <button class="btn btn-primary submit-btn btn-block">Submit</button>
+                                        <input type="text" value="@response.fold("")(_.answer)" name="answer" v-model="answer" class="form-control" id="InputAns" placeholder="Answer">
                                     </div>
-                                </form>
-                            </div>
+                                }
+                                <div class="form-group">
+                                    <label>Why?</label>
+                                    <input class="form-control" name="reason" placeholder="Reason" v-model="reason">
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-primary submit-btn btn-block" :disabled="!isValidForm">
+                                        {{submitButtonText}}
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <style>
-                h4 {
-                    text-transform: none !important;
+    </div>
+    <script>
+            new Vue({
+                el: '#app',
+                data: {
+                    answer: "@response.fold("")(_.answer)",
+                    reason: "@comment.fold("")(_.comment)"
+                },
+                methods: {},
+                computed: {
+                    isValidForm(){
+                        return this.answer !== "" && this.reason.trim() !== "";
+                    },
+                    submitButtonText() {
+                        return this.isValidForm ? "Submit" : "Please complete the form"
+                    }
                 }
+            })
+    </script>
+    <style>
+            h4 {
+                text-transform: none !important;
+            }
 
-                .progress {
-                    height: 12px;
-                }
-        </style>
-    }
+            .progress {
+                height: 12px;
+            }
+    </style>
+}
