@@ -54,16 +54,18 @@ class QuestionController @Inject()(
   def askQuestion(id: Long): Action[AnyContent] = authenticatedAssessorAction { implicit request =>
     // TODO: Improve performance
     val uid: Long = request.session.get("uid").get.toLong
-    val futures: Future[(Option[Response], Option[Question])] = for {
+    val futures: Future[(Option[Response], Option[Question], Option[Question])] = for {
       response <- responseDAO.get(uid, id)
       question <- questionDAO.getById(id)
-    } yield (response, question)
-    val (response: Option[Response], question) = Await.result(futures, Duration.Inf)
+      lastQuestion <- questionDAO.getLast(question.get.evaluationId)
+    } yield (response, question, lastQuestion)
+    val (response: Option[Response], question, lastQuestion) = Await.result(futures, Duration.Inf)
     val comment: Option[Comment] = response match {
       case Some(r) => Await.result(commentDAO.get(uid, r.id.get), Duration.Inf)
       case None => None
     }
-    Ok(views.html.askQuestion(question.get, response, comment))
+    val completedPercent: Float = ((question.get.seq + 1).toFloat / (lastQuestion.get.seq + 1).toFloat) * 100
+    Ok(views.html.askQuestion(question.get, response, comment, lastQuestion.get, completedPercent.toInt))
   }
 
   def updateSeq(): Action[AnyContent] = authenticatedManagerAction.async { implicit request =>
