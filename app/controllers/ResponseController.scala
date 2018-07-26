@@ -36,7 +36,7 @@ class ResponseController @Inject()(
     val creatorId: Long = request.session.get("uid").get.toLong
     val futures: Future[(Response, Comment, Option[Question])] = for {
       upsertedResponse <- responseDAO.upsert(Response(id = responseId, answer = answer, creatorId = creatorId, questionId = questionId))
-      upsertedComment <- commentDAO.upsert(Comment(commentId, reason, creatorId, responseId.get))
+      upsertedComment <- commentDAO.upsert(Comment(commentId, reason, creatorId, upsertedResponse.id.get))
       question <- questionDAO.getById(questionId)
     } yield (upsertedResponse, upsertedComment, question)
     val (_, _, question) = Await.result(futures, Duration.Inf)
