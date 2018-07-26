@@ -3,7 +3,7 @@ package models
 import models.QuestionType.QuestionType
 import play.api.libs.json.{Json, OFormat, Reads, Writes}
 
-case class Question(id: Option[Long] = None, content: String, questionType: QuestionType, evaluationId: Long)
+case class Question(id: Option[Long] = None, content: String, questionType: QuestionType, evaluationId: Long, seq: Int)
 
 object QuestionType extends Enumeration {
   type QuestionType = Value

@@ -20,6 +20,7 @@ POST          /management/evaluation                                       contr
 GET           /management/evaluation/:id/edit                              controllers.QuestionController.managementQuestionList(id: Long)
 POST          /management/question                                         controllers.QuestionController.upsertQuestion
 DELETE        /management/question/:id                                     controllers.QuestionController.deleteQuestion(id: Long)
+PUT           /management/question/seq                                     controllers.QuestionController.updateSeq
 DELETE        /management/evaluation/:id                                   controllers.EvaluationController.deleteEvaluation(id: Long)
 GET           /management/evaluation/:evaluationFormId/user/:userId        controllers.EvaluationController.managementEvaluationResponse(evaluationFormId: Long,userId: Long)
 GET           /userlist                                                    controllers.UserController.userList

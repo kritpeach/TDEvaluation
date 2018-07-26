@@ -3,7 +3,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@@1.7.0/Sortable.min.js"></script>
     <script src="https://cdn.rawgit.com/David-Desmaisons/Vue.Draggable/master/dist/vuedraggable.min.js"></script>
     <div id="app">
-        {{this.questionSeq}}
         <div class="row">
             <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">
@@ -49,7 +48,7 @@
                                         <th class="text-right">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody is="draggable" :list="questionList" :element="'tbody'">
+                                <tbody v-on:change="updateSeq" is="draggable" :list="questionList" :element="'tbody'">
                                     <tr v-for="q in questionList" :key="q.id">
                                         <td>{{q.content}}</td>
                                         <td>{{q.questionType}}</td>
@@ -116,11 +115,17 @@
                     isEditMode: false
                 },
                 computed: {
-                    questionSeq() {
-                        return this.questionList.map(q => q.id)
-                    }
+
                 },
                 methods: {
+                    updateSeq() {
+                        const seq = this.questionList.map(q => q.id);
+                        fetch(`/management/question/seq?csrfToken=@helper.CSRF.getToken.value`,{
+                            method: 'put',
+                            credentials: 'same-origin',
+                            body: JSON.stringify(seq)
+                        });
+                    },
                     async editTitle() {
                         const title = prompt("Change title", this.title);
                         if (title) {

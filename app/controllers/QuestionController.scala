@@ -65,4 +65,9 @@ class QuestionController @Inject()(
     }
     Ok(views.html.askQuestion(question.get, response, comment))
   }
+
+  def updateSeq(): Action[AnyContent] = authenticatedManagerAction.async { implicit request =>
+    val seq = Json.parse(request.body.asText.get).as[List[Long]]
+    questionDAO.updateQuestionSeq(seq).map(_ => Ok(Json.obj("success" -> true)))
+  }
 }

@@ -39,8 +39,8 @@ class ResponseController @Inject()(
       upsertedComment <- commentDAO.upsert(Comment(commentId, reason, creatorId, responseId.get))
       question <- questionDAO.getById(questionId)
     } yield (upsertedResponse, upsertedComment, question)
-    val (upsertedResponse, _, question) = Await.result(futures, Duration.Inf)
-    questionDAO.getNextQuestion(upsertedResponse.questionId, question.get.evaluationId).map({
+    val (_, _, question) = Await.result(futures, Duration.Inf)
+    questionDAO.getNextQuestion(question.get).map({
       case Some(q) => Redirect(routes.QuestionController.askQuestion(q.id.get))
       case None => Redirect(routes.ResponseController.complete())
     })
