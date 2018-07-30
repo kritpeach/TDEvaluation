@@ -6,7 +6,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <title>@title</title>
-        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        nav-item dropdown<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
         <link rel="stylesheet" href="@routes.Assets.versioned("starAdmin/vendors/iconfonts/mdi/css/materialdesignicons.min.css")">
         <link rel="stylesheet" href="@routes.Assets.versioned("starAdmin/vendors/css/vendor.bundle.base.css")">
         <link rel="stylesheet" href="@routes.Assets.versioned("starAdmin/vendors/css/vendor.bundle.addons.css")">
@@ -27,6 +27,7 @@
                 </div>
                 <div class="navbar-menu-wrapper d-flex align-items-center">
                     <ul class="navbar-nav navbar-nav-right">
+                        <!--
                         <li class="nav-item dropdown">
                             <a class="nav-link count-indicator dropdown-toggle" id="messageDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
                                 <i class="mdi mdi-file-document-box"></i>
@@ -137,6 +138,7 @@
                                 </a>
                             </div>
                         </li>
+        -->
                         <li class="nav-item dropdown d-none d-xl-inline-block">
                             <a class="nav-link dropdown-toggle" id="UserDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
                                 <span class="profile-text"></span>
@@ -156,6 +158,7 @@
                                         </div>
                                     </div>
                                 </a>
+                                <!--
                                 <a class="dropdown-item mt-2">
                                     Manage Accounts
                                 </a>
@@ -165,6 +168,7 @@
                                 <a class="dropdown-item">
                                     Check Inbox
                                 </a>
+                                -->
                                 <a class="dropdown-item" href="@routes.UserController.signOut">
                                     Sign Out
                                 </a>

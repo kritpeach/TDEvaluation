@@ -116,12 +116,15 @@
                                 if (questionResponse.response_id === formattedCommentResult.response_id) {
                                     if (questionResponse.comments.length === 0)
                                         return [...state, {...questionResponse, comments: [formattedCommentResult]}];
+                                    if (questionResponse.comments.filter(c => c.comment_id === formattedCommentResult.comment_id).length === 0)
+                                        return [...state, {...questionResponse, comments: [...questionResponse.comments, formattedCommentResult]}]
                                     const newComments = questionResponse.comments.map(comment => comment.comment_id === formattedCommentResult.comment_id ? formattedCommentResult : comment);
                                     const newQuestionResponse = {...questionResponse, comments: newComments};
                                     return [...state, newQuestionResponse];
                                 }
-                                else
+                                else {
                                     return [...state, questionResponse];
+                                }
                             }, []);
                             alert(`Done`);
                         }
