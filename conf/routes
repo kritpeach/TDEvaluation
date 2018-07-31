@@ -1,6 +1,6 @@
 # An example controller showing a sample home page
 GET           /                                                            controllers.HomeController.index
-
+GET           /setup                                                       controllers.HomeController.createTable
 GET           /signin                                                      controllers.UserController.signIn
 GET           /signOut                                                     controllers.UserController.signOut
 POST          /auth                                                        controllers.UserController.authenticate
