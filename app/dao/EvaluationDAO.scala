@@ -38,7 +38,6 @@ class EvaluationDAO @Inject()(val userDAO: UserDAO, protected val dbConfigProvid
     case None => evaluation
     case Some(u) => evaluation.copy(id = u.id)
   }
-
   def createTable: Future[Unit] = db.run(Evaluations.schema.create)
 
   def updateTitle(id: Long, title: String): Future[Int] = db.run(Evaluations.filter(_.id === id).map(_.title).update(title))
