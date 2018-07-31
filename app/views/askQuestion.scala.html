@@ -35,12 +35,12 @@
                                         </div>
                                     } else {
                                         <div class="form-group">
-                                            <input type="text" value="@response.fold("")(_.answer)" name="answer" v-model="answer" class="form-control" id="InputAns" placeholder="Answer">
+                                            <input type="text" autocomplete="off" value="@response.fold("")(_.answer)" name="answer" v-model="answer" class="form-control" id="InputAns" placeholder="Answer">
                                         </div>
                                     }
                                     <div class="form-group">
                                         <label>Why?</label>
-                                        <input class="form-control" name="reason" placeholder="Reason" v-model="reason">
+                                        <input type="text" autocomplete="off" class="form-control" name="reason" placeholder="Reason" v-model="reason">
                                     </div>
                                     <div class="form-group">
                                         <button class="btn btn-primary submit-btn btn-block" :disabled="!isValidForm">
