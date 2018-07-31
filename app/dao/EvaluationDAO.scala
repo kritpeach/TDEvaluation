@@ -100,7 +100,7 @@ class EvaluationDAO @Inject()(val userDAO: UserDAO, protected val dbConfigProvid
 
     def * = (id.?, title, enabled, createAt, creatorId) <> ((Evaluation.apply _).tupled, Evaluation.unapply)
 
-    def creator = foreignKey("CREATOR_FK", creatorId, userDAO.Users)(_.id, onDelete = ForeignKeyAction.Cascade)
+    def creator = foreignKey("CREATOR_FK", creatorId, userDAO.Users)(_.id)
   }
 
 }
