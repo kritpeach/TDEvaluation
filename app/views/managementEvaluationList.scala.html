@@ -59,7 +59,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button v-on:click="submit" :disabled="submitting" class="btn btn-success mr-2">
+                            <button v-on:click="submit" :disabled="submitting || !isFormValid" class="btn btn-success mr-2">
                                 <i v-if="submitting" class="mdi mdi-refresh mdi-spin"></i>Submit</button>
                             <button class="btn btn-light" data-dismiss="modal">Cancel</button>
                         </div>
@@ -89,6 +89,9 @@
                                     return 1;
                                 return 0;
                             });
+                        },
+                        isFormValid() {
+                            return this.form.title !== '';
                         }
                     },
                     methods: {
