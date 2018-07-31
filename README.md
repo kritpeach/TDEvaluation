@@ -42,6 +42,7 @@ Password: 123456
 - Change comment textbox in manager page to rich textbox
 - Support multiple response for each question
 - Optimize performance
+- Handle duplicate unique value without 23505 Postgres SQL exception 
 - Testing
 
 ###Authors
