@@ -1,6 +1,6 @@
 # TDEvaluation
 Evaluation system
-#Features
+###Features
 
 - Authorization and authentication
 - User management
@@ -12,17 +12,17 @@ Evaluation system
 	- Draggable
 - Submitting response
 
-#User roles
+###User roles
 - Manager
 - Assessor
 
-#Prerequisites
+###Prerequisites
 - IntelliJ IDEA
 - PostgresSQL
 - Java 8+
 - sbt
 
-#Installation
+###Installation
 1. Config database connection in application.conf
 ```
 default.db.url = "jdbc:postgresql://localhost:5432/evaluation?currentSchema=public"
@@ -37,15 +37,15 @@ Username: manager
 Password: 123456
 ```
 
-#Todo
+###Todo
 - Improve authorization
 - Change comment textbox in manager page to rich textbox
 - Support multiple response for each question
 - Optimize performance
 - Testing
 
-#Authors
+###Authors
 - Krit Chernkwansri - Initial work
 
-#Acknowledgments
+###Acknowledgments
 All Tradition Chiang Mai staffs for the great taking care and giving the precious opportunity to learn and develop this software
