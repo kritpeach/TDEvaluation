@@ -46,7 +46,7 @@ Password: 123456
 - Testing
 
 ### Authors
-- Krit Chernkwansri - Initial work
+- KritPeAcH - Initial work
 
 ### Acknowledgments
 All Tradition Chiang Mai staffs for the great taking care and giving the precious opportunity to learn and develop this software
