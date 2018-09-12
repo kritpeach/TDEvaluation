@@ -166,6 +166,7 @@
                         });
                         const result = await response.json();
                         if (!this.isEditMode && result.success) {
+                            this.updateSeq();
                             this.questionList = [...this.questionList, result.question];
                             this.form = {...emptyForm};
                             $("#myModal").modal('hide');
